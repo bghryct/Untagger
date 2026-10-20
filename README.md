@@ -10,7 +10,7 @@ Tag coverage for every Google Fonts family, built from the official tag database
 - **Partly tagged**: families with some tags but below 100% on the Expected measure.
 - **Untagged**: families with no rows in `families.csv`.
 
-Filter any view by name, category, gap type, Tagger % and Expected % (both percentage filters work whichever measure is shown). The search box also takes tag paths: `/Sans/Humanist` finds families with that tag, and `!/Quality` finds families without one. Filters are saved in the URL, so a filtered view can be shared as a link. **Compact** hides the font previews.
+Filter any view by name, category, gap type, Tagger % and Expected % (both percentage filters work whichever measure is shown). The search box also takes tag paths: `/Sans/Humanist` finds families with that tag, and `!/Quality` finds families without one. Filters are saved in the URL, so a filtered view can be shared as a link. Lists start in **Compact** layout; switch to **Previews** to see each family rendered in its own font.
 
 Each row has a **Tags** panel listing every tag with its score (VF marks variable-font tags scored at several axis positions), plus the Expressive tags it hasn't been scored on. Click a tag to list the families that have it. The current list can be copied or downloaded as TXT, CSV or JSON.
 

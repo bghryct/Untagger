@@ -64,7 +64,7 @@
   }
 </style>
 </head>
-<body data-view="previews" class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+<body data-view="compact" class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
 <div class="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
 
   <!-- Header -->
@@ -602,7 +602,7 @@
   // ---------------------------------------------------------------------------
   // State (mirrored into the URL hash so filtered views can be shared)
   // ---------------------------------------------------------------------------
-  const DEFAULTS = { scope: 'all', measure: 'tagger', query: '', category: '', issue: '', tpct: '', epct: '', sort: 'least', view: 'previews' };
+  const DEFAULTS = { scope: 'all', measure: 'tagger', query: '', category: '', issue: '', tpct: '', epct: '', sort: 'least', view: 'compact' };
   const URL_KEYS = { scope: 'show', measure: 'measure', query: 'q', category: 'cat', issue: 'gap', tpct: 'tagger', epct: 'expected', sort: 'sort', view: 'layout' };
   const VALID = {
     scope: (v) => v in SCOPES,
