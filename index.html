@@ -60,6 +60,7 @@
   .tag-chip-missing { @apply border-dashed bg-transparent text-zinc-400 dark:bg-transparent dark:text-zinc-500; }
   .tag-chip-warn { @apply border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300; }
   .code { @apply font-mono text-[12px] text-zinc-700 dark:text-zinc-300; }
+  .ctl-label { @apply text-sm text-zinc-500 dark:text-zinc-400; }
   }
 </style>
 </head>
@@ -93,17 +94,17 @@
     <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:text-xs dark:text-zinc-400">Catalog</div>
       <div id="m-total" class="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">—</div>
-      <div id="m-avg" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
+      <div id="m-total-sub" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
     </div>
     <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:text-xs dark:text-zinc-400">Tagged</div>
       <div id="m-tagged" class="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">—</div>
-      <div id="m-full" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
+      <div id="m-tagged-sub" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
     </div>
     <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:text-xs dark:text-zinc-400">Partly tagged</div>
       <div id="m-partial" class="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">—</div>
-      <div id="m-flagged" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
+      <div id="m-partial-sub" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
     </div>
     <div class="rounded-xl border border-indigo-300 bg-indigo-50 p-3 ring-1 ring-indigo-300 sm:p-4 dark:border-indigo-500/50 dark:bg-indigo-500/10 dark:ring-indigo-500/40">
       <div class="text-[11px] font-semibold uppercase tracking-wider text-indigo-700 sm:text-xs dark:text-indigo-300">Untagged</div>
@@ -120,11 +121,16 @@
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div id="scopes" role="tablist" aria-label="Show" class="seg">
         <button role="tab" data-scope="all">All <span class="scope-count tabular-nums opacity-60"></span></button>
-        <button role="tab" data-scope="partial">Partly tagged <span class="scope-count tabular-nums opacity-60"></span></button>
+        <button role="tab" data-scope="partial" title="Has tags, but is below 100% on the Expected measure">Partly tagged <span class="scope-count tabular-nums opacity-60"></span></button>
         <button role="tab" data-scope="untagged">Untagged <span class="scope-count tabular-nums opacity-60"></span></button>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <label class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+        <span class="ctl-label">Measure</span>
+        <div class="seg" role="group" aria-label="Percentage measure">
+          <button type="button" data-measure="tagger" title="Tags scored out of every tag the GF Tagger tracks (the tagger's own completeness)">Tagger</button>
+          <button type="button" data-measure="expected" title="Quality, Expressive and Classification tags a family is expected to have">Expected</button>
+        </div>
+        <label class="ctl-label flex items-center gap-2">
           Sort
           <select id="sort" class="h-8 rounded-lg border border-zinc-200 bg-white px-2 text-sm text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
             <option value="least">Least tagged</option>
@@ -141,22 +147,23 @@
       </div>
     </div>
 
-    <div class="grid gap-2 sm:grid-cols-3 lg:grid-cols-[minmax(0,1fr)_14rem_15rem_9.5rem]">
-      <div class="relative sm:col-span-3 lg:col-span-1">
-        <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" type="search" class="field pl-9" autocomplete="off" spellcheck="false"
-          placeholder="Search names, /tags or !/tags"
-          title="Type a family name. Start with / to find families that have a tag (/Sans/Humanist), or !/ for families without it (!/Expressive/Calm). Press / anywhere to jump here." />
-      </div>
+    <div class="relative">
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" class="field pl-9" autocomplete="off" spellcheck="false"
+        placeholder="Search names, /tags (/Sans/Humanist) or !/tags (!/Quality)"
+        title="Type a family name. Start with / to find families that have a tag (/Sans/Humanist), or !/ for families without it (!/Expressive/Calm). Press / anywhere to jump here." />
+    </div>
+    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
       <select id="category" class="field" aria-label="Category"></select>
       <select id="issue" class="field" aria-label="Tagging gaps"></select>
-      <select id="coverage" class="field" aria-label="Coverage"></select>
+      <select id="tpct" class="field" aria-label="Tagger percentage"></select>
+      <select id="epct" class="field" aria-label="Expected percentage"></select>
     </div>
     <input id="sample" type="text" class="field" aria-label="Preview text" value="The quick brown fox jumps over the lazy dog" />
 
     <details id="legend" class="group rounded-xl border border-zinc-200 bg-white text-sm dark:border-zinc-800 dark:bg-zinc-900">
       <summary class="flex cursor-pointer select-none items-center justify-between gap-2 px-4 py-2.5 text-zinc-600 dark:text-zinc-300">
-        <span>How the tagging percentage works</span>
+        <span>How the percentages work</span>
         <svg class="h-4 w-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
       </summary>
       <div id="legend-body" class="space-y-2 border-t border-zinc-200 px-4 py-3 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400"></div>
@@ -216,15 +223,24 @@
     { label: 'GitHub API', url: 'https://api.github.com/repos/google/fonts/contents/tags/all/families.csv?ref=main', headers: { Accept: 'application/vnd.github.raw' } },
     ...proxied(CSV_URL),
   ];
+  // The GF Tagger's own list of tags; its completeness counts against these.
+  const TAGGER_LIST_SOURCES = [
+    { label: 'GF Tagger', url: 'https://googlefonts.github.io/tagger/tags_metadata.csv' },
+    { label: 'googlefonts/tagger on GitHub', url: 'https://raw.githubusercontent.com/googlefonts/tagger/main/public/tags_metadata.csv' },
+  ];
+  const TAGGER_DEFS_SOURCES = [
+    { label: 'GF Tagger', url: 'https://googlefonts.github.io/tagger/tag_definitions.json' },
+    { label: 'googlefonts/tagger on GitHub', url: 'https://raw.githubusercontent.com/googlefonts/tagger/main/public/tag_definitions.json' },
+  ];
 
-  const CACHE_KEY = 'gfu:data:v3';
+  const CACHE_KEY = 'gfu:data:v4';
   const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
   const COOLDOWN_KEY = 'gfu:lastRefresh';
   const COOLDOWN_MS = 30 * 1000;
   const FETCH_TIMEOUT_MS = 15 * 1000;
   const PAGE_SIZE = 100;
 
-  // Coverage rules (see the "How the tagging percentage works" panel).
+  // Expected-measure rules (see the "How the percentages work" panel).
   const THIN_EXPRESSIVE = 3;            // this many Expressive tags or fewer is flagged
   const EXPECTED_TAG_SHARE = 0.9;       // a Quality tag is expected if 90%+ of tagged families have it
 
@@ -241,7 +257,7 @@
 
   const SCOPES = {
     all: { noun: 'families', test: () => true },
-    partial: { noun: 'partly tagged', test: (f) => f.tagged && f.coverage < 100 },
+    partial: { noun: 'partly tagged', test: (f) => f.tagged && f.expected < 100 },
     untagged: { noun: 'untagged', test: (f) => !f.tagged },
   };
   const ISSUE_FILTERS = [
@@ -252,13 +268,22 @@
     { v: 'classification', label: 'No classification tag', test: (f) => hasIssue(f, 'classification') },
     { v: 'clean', label: 'No flagged gaps', test: (f) => f.issues.length === 0 },
   ];
-  const COVERAGE_FILTERS = [
-    { v: '', label: 'Any %', test: () => true },
-    { v: '0', label: '0%', test: (p) => p === 0 },
-    { v: '1-49', label: '1–49%', test: (p) => p >= 1 && p <= 49 },
-    { v: '50-79', label: '50–79%', test: (p) => p >= 50 && p <= 79 },
-    { v: '80-99', label: '80–99%', test: (p) => p >= 80 && p <= 99 },
-    { v: '100', label: '100%', test: (p) => p === 100 },
+  const TAGGER_PCT_FILTERS = [
+    { v: '', label: 'Tagger %: any', test: () => true },
+    { v: '0', label: 'Tagger 0%', test: (p) => p === 0 },
+    { v: 'lt10', label: 'Tagger under 10%', test: (p) => p > 0 && p < 10 },
+    { v: '10-15', label: 'Tagger 10–15%', test: (p) => p >= 10 && p < 15 },
+    { v: '15-20', label: 'Tagger 15–20%', test: (p) => p >= 15 && p < 20 },
+    { v: '20-25', label: 'Tagger 20–25%', test: (p) => p >= 20 && p < 25 },
+    { v: '25+', label: 'Tagger 25% or more', test: (p) => p >= 25 },
+  ];
+  const EXPECTED_PCT_FILTERS = [
+    { v: '', label: 'Expected %: any', test: () => true },
+    { v: '0', label: 'Expected 0%', test: (p) => p === 0 },
+    { v: '1-49', label: 'Expected 1–49%', test: (p) => p >= 1 && p <= 49 },
+    { v: '50-79', label: 'Expected 50–79%', test: (p) => p >= 50 && p <= 79 },
+    { v: '80-99', label: 'Expected 80–99%', test: (p) => p >= 80 && p <= 99 },
+    { v: '100', label: 'Expected 100%', test: (p) => p === 100 },
   ];
   const hasIssue = (f, key) => f.issues.some((i) => i.key === key);
 
@@ -268,6 +293,7 @@
   const $ = (sel) => document.querySelector(sel);
   const fmt = new Intl.NumberFormat();
   const pct = (x) => (x >= 0.995 && x < 1 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
+  const taggerPct = (p) => (p === 0 ? '0%' : p.toFixed(1) + '%');
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const groupOf = (path) => path.split('/')[1] || '';
   const leaf = (path) => path.split('/').pop();
@@ -326,6 +352,19 @@
     throw e;
   }
 
+  // The tagger's tag set is tag_definitions.json keys plus every name in tags_metadata.csv.
+  // Optional: without it the tagger measure falls back to the tags found in families.csv.
+  async function fetchTaggerTags(fresh) {
+    const [list, defs] = await Promise.allSettled([
+      firstWorking(TAGGER_LIST_SOURCES, parseTaggerList, fresh),
+      firstWorking(TAGGER_DEFS_SOURCES, (text) => Object.keys(JSON.parse(text)), fresh),
+    ]);
+    if (list.status !== 'fulfilled') return null;
+    const names = new Set(list.value.data);
+    if (defs.status === 'fulfilled') defs.value.data.forEach((n) => names.add(n));
+    return { names: [...names].sort(), source: list.value.source };
+  }
+
   // ---------------------------------------------------------------------------
   // Parsing
   // ---------------------------------------------------------------------------
@@ -380,8 +419,10 @@
     return rows;
   }
 
-  // Compact, cacheable form: { vocab: [tagPath], fam: { lowercased family: [[vocabIndex, score, isVariable]] } }.
+  // Compact, cacheable form: { vocab: [tagPath], fam: { lowercased family: [[vocabIndex, score, isVariable, taggerCount]] } }.
   // Variable-font tags have one row per axis position; they collapse to a "min–max" score.
+  // taggerCount mirrors the GF Tagger: each static row is one tagging, and all of a tag's
+  // variable rows ("…@…" axis positions) together are one.
   function parseTags(text) {
     const vocabIndex = new Map();
     const acc = new Map();
@@ -393,11 +434,12 @@
       const key = family.toLowerCase();
       if (!acc.has(key)) acc.set(key, new Map());
       const tags = acc.get(key);
-      if (!tags.has(path)) tags.set(path, { scores: [], vf: false });
+      if (!tags.has(path)) tags.set(path, { scores: [], vf: false, staticRows: 0 });
       const t = tags.get(path);
       const score = parseFloat(r[3]);
       if (!Number.isNaN(score)) t.scores.push(score);
-      if ((r[1] || '').trim()) t.vf = true;
+      if ((r[1] || '').includes('@')) t.vf = true;
+      else t.staticRows++;
     }
     if (acc.size < 100) throw new Error('unexpected tags format');
     const fam = {};
@@ -405,23 +447,41 @@
       fam[key] = [...tags].map(([path, t]) => {
         const lo = Math.min(...t.scores), hi = Math.max(...t.scores);
         const score = !t.scores.length ? '' : lo === hi ? String(lo) : `${lo}–${hi}`;
-        return [vocabIndex.get(path), score, t.vf ? 1 : 0];
+        return [vocabIndex.get(path), score, t.vf ? 1 : 0, t.staticRows + (t.vf ? 1 : 0)];
       });
     }
     return { vocab: [...vocabIndex.keys()], fam };
   }
 
+  function parseTaggerList(text) {
+    const names = text.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')).map((l) => l.split(',')[0]);
+    if (names.filter((n) => n.startsWith('/')).length < 20) throw new Error('unexpected tag list format');
+    return names;
+  }
+
   // ---------------------------------------------------------------------------
-  // Coverage model
+  // Model: both measures, flagged gaps, and the stats behind them
   // ---------------------------------------------------------------------------
-  function buildModel(catalog, tagData) {
+  function buildModel(catalog, tagData, taggerTags) {
     const { vocab, fam } = tagData;
     const families = catalog.map((c) => {
-      const tags = (fam[c.name.toLowerCase()] || []).map(([i, score, vf]) => ({ path: vocab[i], group: groupOf(vocab[i]), score, vf: !!vf }));
+      const tags = (fam[c.name.toLowerCase()] || []).map(([i, score, vf, n]) =>
+        ({ path: vocab[i], group: groupOf(vocab[i]), score, vf: !!vf, n: n ?? 1 }));
       return { ...c, nameLower: c.name.toLowerCase(), tagged: tags.length > 0, tags, tagPathsLower: tags.map((t) => t.path.toLowerCase()) };
     });
     const tagged = families.filter((f) => f.tagged);
     const n = Math.max(tagged.length, 1);
+
+    // Tagger measure: taggings of known tags ÷ all tags except /quant/ (as in the tagger's Todo panel).
+    const taggerKnown = new Set(taggerTags ? taggerTags.names : vocab);
+    const taggerCounted = [...taggerKnown].filter((name) => !name.startsWith('/quant/'));
+    const taggerTotal = Math.max(taggerCounted.length, 1);
+    let taggings = 0;
+    for (const f of families) {
+      f.taggerCount = f.tags.reduce((sum, t) => sum + (taggerKnown.has(t.path) ? t.n : 0), 0);
+      f.tagger = (f.taggerCount / taggerTotal) * 100;
+      taggings += f.taggerCount;
+    }
 
     // How common each tag is across tagged families.
     const freq = new Map();
@@ -434,14 +494,25 @@
     const isSpecial = (f) => f.tags.some((t) => t.group === 'Special use');
     const expressiveCount = (f) => f.tags.filter((t) => t.group === 'Expressive').length;
     const hasExpected = (f) => f.tags.some((t) => expectedFor(f.category).groups.includes(t.group));
-    const counts = tagged.map(expressiveCount).sort((a, b) => a - b);
-    const quantile = (q) => (counts.length ? counts[Math.floor((counts.length - 1) * q)] : 0);
+    const quantile = (sorted, q) => (sorted.length ? sorted[Math.floor((sorted.length - 1) * q)] : 0);
+    const eCounts = tagged.map(expressiveCount).sort((a, b) => a - b);
+    const taggerSorted = tagged.map((f) => f.tagger).sort((a, b) => a - b);
 
     const stats = {
+      share,
       taggedCount: tagged.length,
+      tagger: {
+        total: taggerTotal,
+        source: taggerTags ? taggerTags.source : null,
+        completeness: (taggings / (Math.max(families.length, 1) * taggerTotal)) * 100,
+        p10: quantile(taggerSorted, 0.1),
+        median: quantile(taggerSorted, 0.5),
+        p90: quantile(taggerSorted, 0.9),
+        max: taggerSorted[taggerSorted.length - 1] || 0,
+      },
       expressiveTotal: expressiveVocab.length,
-      expressiveTarget: Math.max(1, quantile(0.25)), // reached by 3 in 4 tagged families
-      expressiveMedian: quantile(0.5),
+      expressiveTarget: Math.max(1, quantile(eCounts, 0.25)), // reached by 3 in 4 tagged families
+      expressiveMedian: quantile(eCounts, 0.5),
       qualityExpected,
       qualityFullShare: tagged.filter((f) => qualityExpected.every((p) => f.tags.some((t) => t.path === p))).length / n,
       classificationShare: {},
@@ -457,8 +528,9 @@
 
     for (const f of families) {
       f.issues = [];
+      f.notInTagger = f.tags.filter((t) => !taggerKnown.has(t.path)).map((t) => t.path);
       if (!f.tagged) {
-        f.coverage = 0;
+        f.expected = 0;
         f.parts = null;
         f.issues.push({ key: 'untagged', label: 'Untagged', why: 'No rows in families.csv yet.' });
         continue;
@@ -473,7 +545,7 @@
       const e = special ? 1 : Math.min(eCount / stats.expressiveTarget, 1);
       const q = qualityExpected.length ? 1 - qMissing.length / qualityExpected.length : 1;
       const c = classified ? 1 : 0;
-      f.coverage = e === 1 && q === 1 && c === 1 ? 100 : Math.min(99, Math.round(((e + q + c) / 3) * 100));
+      f.expected = e === 1 && q === 1 && c === 1 ? 100 : Math.min(99, Math.round(((e + q + c) / 3) * 100));
       f.parts = {
         special, eCount, qMissing,
         qHave: qualityExpected.length - qMissing.length,
@@ -489,7 +561,6 @@
           label: qMissing.length === qualityExpected.length ? 'No /Quality tags'
             : qMissing.length === 1 ? `Missing ${qMissing[0]}` : `Missing ${qMissing.length} /Quality tags`,
           why: `Missing ${qMissing.join(', ')}. ${pct(stats.qualityFullShare)} of tagged families have all ${qualityExpected.length}.`,
-          missed: qMissing,
         });
       }
       if (!special && eCount <= THIN_EXPRESSIVE) {
@@ -497,23 +568,20 @@
           key: 'expressive',
           label: eCount === 0 ? 'No /Expressive tags' : `Only ${eCount} /Expressive tag${eCount === 1 ? '' : 's'}`,
           why: `3 in 4 tagged families have ${stats.expressiveTarget} or more (median ${stats.expressiveMedian}).`,
-          missed: ['/Expressive/…'],
         });
       }
       if (!classified) {
-        const share = classificationShare(f.category);
+        const s = classificationShare(f.category);
         f.issues.push({
           key: 'classification',
           label: expected === ANY_CLASSIFICATION ? 'No classification tag' : `No ${expected.label} tag`,
           why: expected === ANY_CLASSIFICATION
-            ? `No tag under /Sans, /Serif, /Slab, /Script, /Theme, /Monospace or /Special use. ${pct(share)} of tagged ${f.category || 'uncategorized'} families have one.`
-            : `${pct(share)} of tagged ${f.category} families have a ${expected.label} tag.`,
-          missed: expected.groups.filter((g) => g !== 'Not text').map((g) => `/${g}/…`),
+            ? `No tag under /Sans, /Serif, /Slab, /Script, /Theme, /Monospace or /Special use. ${pct(s)} of tagged ${f.category || 'uncategorized'} families have one.`
+            : `${pct(s)} of tagged ${f.category} families have a ${expected.label} tag.`,
         });
       }
     }
 
-    stats.share = share;
     return {
       families,
       byName: new Map(families.map((f) => [f.name, f])),
@@ -522,11 +590,11 @@
       totals: {
         catalog: families.length,
         tagged: tagged.length,
-        full: tagged.filter((f) => f.coverage === 100).length,
+        expectedFull: tagged.filter((f) => f.expected === 100).length,
+        expectedAvg: families.reduce((s, f) => s + f.expected, 0) / Math.max(families.length, 1),
         partial: families.filter(SCOPES.partial.test).length,
         flagged: tagged.filter((f) => f.issues.length).length,
         untagged: families.length - tagged.length,
-        avg: families.reduce((s, f) => s + f.coverage, 0) / Math.max(families.length, 1),
       },
     };
   }
@@ -534,14 +602,16 @@
   // ---------------------------------------------------------------------------
   // State (mirrored into the URL hash so filtered views can be shared)
   // ---------------------------------------------------------------------------
-  const DEFAULTS = { scope: 'all', query: '', category: '', issue: '', coverage: '', sort: 'least', view: 'previews' };
-  const URL_KEYS = { scope: 'show', query: 'q', category: 'cat', issue: 'gap', coverage: 'pct', sort: 'sort', view: 'layout' };
+  const DEFAULTS = { scope: 'all', measure: 'tagger', query: '', category: '', issue: '', tpct: '', epct: '', sort: 'least', view: 'previews' };
+  const URL_KEYS = { scope: 'show', measure: 'measure', query: 'q', category: 'cat', issue: 'gap', tpct: 'tagger', epct: 'expected', sort: 'sort', view: 'layout' };
   const VALID = {
     scope: (v) => v in SCOPES,
+    measure: (v) => v === 'tagger' || v === 'expected',
     query: () => true,
     category: (v) => v === '' || CATEGORIES.includes(v),
     issue: (v) => ISSUE_FILTERS.some((o) => o.v === v),
-    coverage: (v) => COVERAGE_FILTERS.some((o) => o.v === v),
+    tpct: (v) => TAGGER_PCT_FILTERS.some((o) => o.v === v),
+    epct: (v) => EXPECTED_PCT_FILTERS.some((o) => o.v === v),
     sort: (v) => v in SORTERS,
     view: (v) => v === 'previews' || v === 'compact',
   };
@@ -556,6 +626,7 @@
     // Partial results kept so a manual file can fill in whichever fetch failed.
     lastCatalog: null,
     lastTags: null,
+    lastTaggerTags: null,
   };
 
   function readUrl() {
@@ -584,8 +655,13 @@
     return null;
   }
 
-  function useData(catalog, tags, meta) {
-    state.model = buildModel(catalog, tags);
+  function saveAndUse(catalog, tags, taggerTags, meta) {
+    store.set(CACHE_KEY, JSON.stringify({ ...meta, catalog, tags, taggerTags }));
+    useData(catalog, tags, taggerTags, { ...meta, fromCache: false });
+  }
+
+  function useData(catalog, tags, taggerTags, meta) {
+    state.model = buildModel(catalog, tags, taggerTags);
     state.meta = meta;
     render();
   }
@@ -593,7 +669,7 @@
   async function load({ fresh = false } = {}) {
     const cached = readCache();
     if (!fresh && cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-      useData(cached.catalog, cached.tags, { ...cached, fromCache: true });
+      useData(cached.catalog, cached.tags, cached.taggerTags, { ...cached, fromCache: true });
       return;
     }
 
@@ -601,19 +677,22 @@
     hideBanner();
     render();
 
-    const [cat, tags] = await Promise.allSettled([
+    const [cat, tags, taggerTags] = await Promise.allSettled([
       firstWorking(CATALOG_SOURCES, parseCatalog, fresh),
       firstWorking(TAG_SOURCES, parseTags, fresh),
+      fetchTaggerTags(fresh),
     ]);
     state.loading = false;
 
     if (cat.status === 'fulfilled') state.lastCatalog = cat.value;
     if (tags.status === 'fulfilled') state.lastTags = tags.value;
+    // Fall back to the last good tag list (or the cache's) rather than to families.csv's tags.
+    const tagList = (taggerTags.status === 'fulfilled' && taggerTags.value) || state.lastTaggerTags || (cached && cached.taggerTags) || null;
+    state.lastTaggerTags = tagList;
 
     if (cat.status === 'fulfilled' && tags.status === 'fulfilled') {
-      const meta = { fetchedAt: Date.now(), catalogSource: cat.value.source, tagSource: tags.value.source };
-      store.set(CACHE_KEY, JSON.stringify({ ...meta, catalog: cat.value.data, tags: tags.value.data }));
-      useData(cat.value.data, tags.value.data, { ...meta, fromCache: false });
+      saveAndUse(cat.value.data, tags.value.data, tagList,
+        { fetchedAt: Date.now(), catalogSource: cat.value.source, tagSource: tags.value.source });
       return;
     }
 
@@ -622,7 +701,7 @@
     if (tags.status === 'rejected') failures.push({ what: 'Tags (families.csv)', details: tags.reason.details || [tags.reason.message] });
 
     if (cached) {
-      useData(cached.catalog, cached.tags, { ...cached, fromCache: true });
+      useData(cached.catalog, cached.tags, cached.taggerTags, { ...cached, fromCache: true });
       showError(`Couldn't refresh, so this is cached data from ${relativeTime(cached.fetchedAt)}.`, failures);
     } else if (state.model) {
       render();
@@ -647,10 +726,9 @@
       }
     }
     if (state.lastCatalog && state.lastTags) {
-      const meta = { fetchedAt: Date.now(), catalogSource: state.lastCatalog.source, tagSource: state.lastTags.source };
-      store.set(CACHE_KEY, JSON.stringify({ ...meta, catalog: state.lastCatalog.data, tags: state.lastTags.data }));
       hideBanner();
-      useData(state.lastCatalog.data, state.lastTags.data, { ...meta, fromCache: false });
+      saveAndUse(state.lastCatalog.data, state.lastTags.data, state.lastTaggerTags,
+        { fetchedAt: Date.now(), catalogSource: state.lastCatalog.source, tagSource: state.lastTags.source });
     } else {
       toast(state.lastCatalog ? 'Catalog loaded. Now add families.csv' : 'Tags loaded. Now add the catalog JSON');
     }
@@ -659,6 +737,9 @@
   // ---------------------------------------------------------------------------
   // Filtering & sorting
   // ---------------------------------------------------------------------------
+  const measureOf = (f) => (state.measure === 'tagger' ? f.tagger : f.expected);
+  const otherMeasureOf = (f) => (state.measure === 'tagger' ? f.expected : f.tagger);
+
   function queryTest(raw) {
     const s = raw.trim().toLowerCase();
     if (!s) return () => true;
@@ -671,23 +752,26 @@
   // `skip` leaves one filter out, so each dropdown can show counts for its own options.
   function filtered(skip) {
     const q = queryTest(state.query);
-    // Gap and coverage filters are hidden for untagged families (all 0%, no tags), so ignore them there.
+    // Gap and percentage filters are hidden for untagged families (no tags, 0%), so ignore them there.
     const untaggedOnly = state.scope === 'untagged';
-    const issue = untaggedOnly ? ISSUE_FILTERS[0] : ISSUE_FILTERS.find((o) => o.v === state.issue);
-    const cov = untaggedOnly ? COVERAGE_FILTERS[0] : COVERAGE_FILTERS.find((o) => o.v === state.coverage);
+    const pick = (list, v) => (untaggedOnly ? list[0] : list.find((o) => o.v === v));
+    const issue = pick(ISSUE_FILTERS, state.issue);
+    const tpct = pick(TAGGER_PCT_FILTERS, state.tpct);
+    const epct = pick(EXPECTED_PCT_FILTERS, state.epct);
     return state.model.families.filter((f) =>
       SCOPES[state.scope].test(f) &&
       (skip === 'category' || !state.category || f.category === state.category) &&
       (skip === 'issue' || issue.test(f)) &&
-      (skip === 'coverage' || cov.test(f.coverage)) &&
+      (skip === 'tpct' || tpct.test(f.tagger)) &&
+      (skip === 'epct' || epct.test(f.expected)) &&
       q(f));
   }
 
   const byName = (a, b) => a.name.localeCompare(b.name);
   const byNewest = (a, b) => (b.added || '').localeCompare(a.added || '');
   const SORTERS = {
-    least: (a, b) => a.coverage - b.coverage || b.issues.length - a.issues.length || byNewest(a, b) || byName(a, b),
-    most: (a, b) => b.coverage - a.coverage || b.tags.length - a.tags.length || byName(a, b),
+    least: (a, b) => measureOf(a) - measureOf(b) || otherMeasureOf(a) - otherMeasureOf(b) || b.issues.length - a.issues.length || byNewest(a, b) || byName(a, b),
+    most: (a, b) => measureOf(b) - measureOf(a) || otherMeasureOf(b) - otherMeasureOf(a) || byName(a, b),
     newest: (a, b) => byNewest(a, b) || byName(a, b),
     name: byName,
     popular: (a, b) => (a.popularity ?? Infinity) - (b.popularity ?? Infinity) || byName(a, b),
@@ -700,18 +784,24 @@
   // ---------------------------------------------------------------------------
   function render() {
     document.body.dataset.view = state.view;
-    document.querySelectorAll('[data-view]').forEach((b) => b.tagName === 'BUTTON' && b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+    document.querySelectorAll('button[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+    document.querySelectorAll('button[data-measure]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.measure === state.measure)));
     $('#sort').value = state.sort;
     if ($('#search').value !== state.query) $('#search').value = state.query;
 
     const m = state.model;
     const t = m && m.totals;
+    const ts = m && m.stats.tagger;
+    const tagger = state.measure === 'tagger';
     $('#m-total').textContent = t ? fmt.format(t.catalog) : '—';
-    $('#m-avg').textContent = t ? `${Math.round(t.avg)}% tagged on average` : '\u00a0';
+    $('#m-total-sub').textContent = !t ? '\u00a0' : tagger
+      ? `${ts.completeness.toFixed(1)}% complete (tagger)` : `${Math.round(t.expectedAvg)}% expected, on average`;
+    $('#m-total-sub').title = t ? `The GF Tagger's Todo panel figure: ${ts.completeness.toFixed(3)}% complete` : '';
     $('#m-tagged').textContent = t ? fmt.format(t.tagged) : '—';
-    $('#m-full').textContent = t ? `${fmt.format(t.full)} at 100%` : '\u00a0';
+    $('#m-tagged-sub').textContent = !t ? '\u00a0' : tagger
+      ? `median ${taggerPct(ts.median)} of ${ts.total} tags` : `${fmt.format(t.expectedFull)} at 100% expected`;
     $('#m-partial').textContent = t ? fmt.format(t.partial) : '—';
-    $('#m-flagged').textContent = t ? `${fmt.format(t.flagged)} with flagged gaps` : '\u00a0';
+    $('#m-partial-sub').textContent = t ? `${fmt.format(t.flagged)} with flagged gaps` : '\u00a0';
     $('#m-untagged').textContent = t ? fmt.format(t.untagged) : '—';
 
     document.querySelectorAll('[data-scope]').forEach((btn) => {
@@ -739,12 +829,14 @@
       (o) => (o.v ? catPool.filter((f) => f.category === o.v).length : catPool.length));
     const issuePool = m ? filtered('issue') : [];
     optionList($('#issue'), ISSUE_FILTERS, state.issue, (o) => issuePool.filter(o.test).length);
-    const covPool = m ? filtered('coverage') : [];
-    optionList($('#coverage'), COVERAGE_FILTERS, state.coverage, (o) => covPool.filter((f) => o.test(f.coverage)).length);
+    const tPool = m ? filtered('tpct') : [];
+    optionList($('#tpct'), TAGGER_PCT_FILTERS, state.tpct, (o) => tPool.filter((f) => o.test(f.tagger)).length);
+    const ePool = m ? filtered('epct') : [];
+    optionList($('#epct'), EXPECTED_PCT_FILTERS, state.epct, (o) => ePool.filter((f) => o.test(f.expected)).length);
 
-    $('#issue').classList.toggle('hidden', state.scope === 'untagged');
-    $('#coverage').classList.toggle('hidden', state.scope === 'untagged');
-    const active = state.query || state.category || state.issue || state.coverage;
+    const untaggedOnly = state.scope === 'untagged';
+    ['#issue', '#tpct', '#epct'].forEach((id) => $(id).classList.toggle('hidden', untaggedOnly));
+    const active = state.query || state.category || state.issue || state.tpct || state.epct;
     $('#reset').classList.toggle('hidden', !active);
   }
 
@@ -752,17 +844,21 @@
     const m = state.model;
     if (!m) { $('#legend-body').innerHTML = '<p>Loads with the data.</p>'; return; }
     const s = m.stats;
+    const ts = s.tagger;
     const code = (x) => `<span class="code">${esc(x)}</span>`;
     const share = (cat) => pct(s.classificationShare[cat] || 0);
+    const b = (x) => `<b class="font-medium text-zinc-800 dark:text-zinc-200">${x}</b>`;
     $('#legend-body').innerHTML = `
-      <p>Each family's percentage is the average of three parts. 100% means it's tagged to the usual standard, and 0% means it has no tags at all.</p>
+      <p>${b('Tagger')} (the default) uses the GF Tagger's own measure: tags scored out of all ${ts.total} tags the tagger tracks (its ${code('/quant')} measurements aren't counted). A variable-font tag counts once, however many axis positions it's scored at. Across the catalog this gives ${b(ts.completeness.toFixed(3) + '%')}, the figure the tagger's Todo panel shows as “Tagging is … complete”. Most tags only suit some fonts (Seasonal, Theme, Script…), so no family gets near 100%: the median is ${taggerPct(ts.median)} and the highest is ${taggerPct(ts.max)}.${ts.source ? '' : ` <span class="text-amber-700 dark:text-amber-300">The tagger's tag list couldn't be loaded, so this uses the ${ts.total} tags found in families.csv instead.</span>`}</p>
+      <p>${b('Expected')} averages three parts, so 100% means a family is tagged to the usual standard:</p>
       <ul class="list-disc space-y-1 pl-5">
-        <li><b class="font-medium text-zinc-800 dark:text-zinc-200">Quality</b>: how many of the ${s.qualityExpected.length} ${code('/Quality')} tags are scored. ${pct(s.qualityFullShare)} of tagged families have all of them.</li>
-        <li><b class="font-medium text-zinc-800 dark:text-zinc-200">Expressive</b>: ${code('/Expressive')} tags scored, out of ${s.expressiveTarget}. Taggers pick these selectively, so nobody is expected to have all ${s.expressiveTotal}; 3 in 4 tagged families have ${s.expressiveTarget} or more (median ${s.expressiveMedian}).</li>
-        <li><b class="font-medium text-zinc-800 dark:text-zinc-200">Classification</b>: whether it has a tag in the group its category calls for. Sans Serif → ${code('/Sans')} (${share('Sans Serif')} do), Serif → ${code('/Serif')} or ${code('/Slab')} (${share('Serif')}), Handwriting → ${code('/Script')} (${share('Handwriting')}), Monospace → ${code('/Monospace')} (${share('Monospace')}), Display → any of ${code('/Sans')}, ${code('/Serif')}, ${code('/Slab')}, ${code('/Script')}, ${code('/Theme')}, ${code('/Monospace')}, ${code('/Special use')} (${share('Display')}).</li>
+        <li>${b('Quality')}: how many of the ${s.qualityExpected.length} ${code('/Quality')} tags are scored. ${pct(s.qualityFullShare)} of tagged families have all of them.</li>
+        <li>${b('Expressive')}: ${code('/Expressive')} tags scored, out of ${s.expressiveTarget}. Taggers pick these selectively, so nobody is expected to have all ${s.expressiveTotal}; 3 in 4 tagged families have ${s.expressiveTarget} or more (median ${s.expressiveMedian}).</li>
+        <li>${b('Classification')}: whether it has a tag in the group its category calls for. Sans Serif → ${code('/Sans')} (${share('Sans Serif')} do), Serif → ${code('/Serif')} or ${code('/Slab')} (${share('Serif')}), Handwriting → ${code('/Script')} (${share('Handwriting')}), Monospace → ${code('/Monospace')} (${share('Monospace')}), Display → any of ${code('/Sans')}, ${code('/Serif')}, ${code('/Slab')}, ${code('/Script')}, ${code('/Theme')}, ${code('/Monospace')}, ${code('/Special use')} (${share('Display')}).</li>
       </ul>
-      <p><b class="font-medium text-zinc-800 dark:text-zinc-200">Flagged gaps</b> are the likely misses: a missing Quality tag, ${THIN_EXPRESSIVE} or fewer Expressive tags, or no classification tag. Families with a ${code('/Special use')} tag (barcodes, redaction, symbols) get full marks for Expressive and Classification.</p>
-      <p>Open a family's <b class="font-medium text-zinc-800 dark:text-zinc-200">Tags</b> panel to see every score and the Expressive tags it hasn't been scored on. Click any tag to list the families that have it, or a dashed one to list the families that don't.</p>`;
+      <p>The ${b('Measure')} switch sets which percentage is shown big and used for “Least/Most tagged” sorting; both can always be filtered. ${b('Partly tagged')} means below 100% on Expected, since on the tagger's measure every family is partly tagged.</p>
+      <p>${b('Flagged gaps')} are the likely misses: a missing Quality tag, ${THIN_EXPRESSIVE} or fewer Expressive tags, or no classification tag. Families with a ${code('/Special use')} tag (barcodes, redaction, symbols) get full Expected marks for Expressive and Classification.</p>
+      <p>Open a family's ${b('Tags')} panel to see every score and the Expressive tags it hasn't been scored on. Click any tag to list the families that have it, or a dashed one to list the families that don't.</p>`;
   }
 
   function renderList() {
@@ -797,7 +893,7 @@
 
     if (!rows.length) {
       const msg = scopeTotal === 0
-        ? (state.scope === 'untagged' ? 'Every catalog family has at least one tag.' : 'Nothing here: every tagged family is at 100%.')
+        ? (state.scope === 'untagged' ? 'Every catalog family has at least one tag.' : 'Nothing here: every tagged family is at 100% expected.')
         : 'No families match these filters.';
       list.innerHTML = `<li class="px-5 py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">${esc(msg)}</li>`;
       return;
@@ -821,15 +917,32 @@
     });
   }
 
-  function coverageTone(p) {
-    if (p === 100) return { text: 'text-emerald-700 dark:text-emerald-400', bar: 'bg-emerald-500' };
-    if (p >= 80) return { text: 'text-zinc-800 dark:text-zinc-200', bar: 'bg-indigo-500' };
-    if (p >= 50) return { text: 'text-amber-700 dark:text-amber-300', bar: 'bg-amber-500' };
-    return { text: 'text-rose-700 dark:text-rose-300', bar: 'bg-rose-500' };
+  const TONES = {
+    good: { text: 'text-emerald-700 dark:text-emerald-400', bar: 'bg-emerald-500' },
+    ok: { text: 'text-zinc-800 dark:text-zinc-200', bar: 'bg-indigo-500' },
+    low: { text: 'text-amber-700 dark:text-amber-300', bar: 'bg-amber-500' },
+    bad: { text: 'text-rose-700 dark:text-rose-300', bar: 'bg-rose-500' },
+  };
+
+  // Tagger %: coloured against the catalog (bottom/top 10%), since nobody nears 100%.
+  function tone(f) {
+    if (state.measure === 'tagger') {
+      const s = state.model.stats.tagger;
+      if (f.tagger === 0) return TONES.bad;
+      if (f.tagger < s.p10) return TONES.low;
+      if (f.tagger >= s.p90) return TONES.good;
+      return TONES.ok;
+    }
+    if (f.expected === 100) return TONES.good;
+    if (f.expected >= 80) return TONES.ok;
+    if (f.expected >= 50) return TONES.low;
+    return TONES.bad;
   }
 
   function rowHtml(f) {
-    const tone = coverageTone(f.coverage);
+    const ts = state.model.stats.tagger;
+    const tagger = state.measure === 'tagger';
+    const t = tone(f);
     const sep = '<span class="text-zinc-300 dark:text-zinc-700" aria-hidden="true">·</span>';
     const warn = 'text-amber-700 dark:text-amber-300';
     let summary;
@@ -852,9 +965,13 @@
     const nonLatin = f.latin ? '' :
       `<span class="chip chip-muted" title="This family has no Latin subset, so the preview falls back to a system font">No Latin glyphs</span>`;
 
+    const big = tagger ? taggerPct(f.tagger) : `${f.expected}%`;
+    const caption = tagger ? `${f.taggerCount}/${ts.total} tags · exp. ${f.expected}%` : `tagger ${taggerPct(f.tagger)}`;
+    const title = `Tagger: ${f.taggerCount} of ${ts.total} tags (${taggerPct(f.tagger)}). Expected: ${f.expected}%.`;
+
     return `
       <li data-name="${esc(f.name)}" data-q="${esc(f.preview.q)}" class="px-4 py-3 sm:px-5">
-        <div class="grid items-center gap-x-5 gap-y-2 sm:grid-cols-[minmax(0,1fr)_6rem_auto]">
+        <div class="grid items-center gap-x-5 gap-y-2 sm:grid-cols-[minmax(0,1fr)_7.5rem_auto]">
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span class="font-medium">${esc(f.name)}</span>
@@ -864,9 +981,10 @@
             <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">${summary}${issues || nonLatin ? `<span class="flex flex-wrap gap-1">${issues}${nonLatin}</span>` : ''}</div>
             <div class="preview mt-1 text-zinc-800 dark:text-zinc-200">${esc(state.sample || f.name)}</div>
           </div>
-          <div class="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1" title="Tagging coverage">
-            <span class="w-10 text-sm font-semibold tabular-nums sm:w-auto ${tone.text}">${f.coverage}%</span>
-            <span class="block h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"><span class="block h-full rounded-full ${tone.bar}" style="width:${f.coverage}%"></span></span>
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:flex-col sm:items-end" title="${esc(title)}">
+            <span class="text-sm font-semibold tabular-nums ${t.text}">${big}</span>
+            <span class="block h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"><span class="block h-full rounded-full ${t.bar}" style="width:${measureOf(f)}%"></span></span>
+            <span class="whitespace-nowrap text-[11px] tabular-nums text-zinc-400 dark:text-zinc-500">${caption}</span>
           </div>
           <div class="flex flex-wrap gap-1.5 sm:justify-end">
             ${f.tagged ? `<button type="button" class="row-action" data-expand aria-expanded="false">Tags <span class="tabular-nums text-zinc-400">${f.tags.length}</span><svg class="h-3 w-3 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>` : ''}
@@ -881,7 +999,7 @@
 
   // Built on demand when a row's Tags panel is opened.
   function tagPanelHtml(f) {
-    const m = state.model, p = f.parts, s = m.stats;
+    const m = state.model, p = f.parts, s = m.stats, ts = s.tagger;
     const scoreValue = (t) => Math.max(...String(t.score).split('–').map(Number).filter((x) => !Number.isNaN(x)), -1);
     const chip = (t, label) => `<button type="button" class="tag-chip" data-tag="${esc(t.path)}" title="List families tagged ${esc(t.path)}${t.vf ? '. Variable font: scored at several axis positions' : ''}">${esc(label)}${t.score !== '' ? ` <span class="tabular-nums text-zinc-400">${esc(t.score)}</span>` : ''}${t.vf ? ' <span class="text-[9px] font-semibold uppercase tracking-wide text-zinc-400">vf</span>' : ''}</button>`;
     const missingChip = (path, label, cls) => `<button type="button" class="tag-chip ${cls}" data-tag="!${esc(path)}" title="List families without ${esc(path)}. ${pct(s.share(path))} of tagged families have it.">${esc(label)} <span class="tabular-nums opacity-70">${pct(s.share(path))}</span></button>`;
@@ -891,6 +1009,13 @@
         <div class="mt-1.5 flex flex-wrap gap-1">${body}</div>
       </div>`;
     const inGroup = (g) => f.tags.filter((t) => t.group === g);
+
+    const measures = `
+      <div class="flex flex-wrap gap-x-4 gap-y-1 text-zinc-600 dark:text-zinc-400">
+        <span><b class="font-semibold text-zinc-800 dark:text-zinc-200">Tagger ${taggerPct(f.tagger)}</b>: ${f.taggerCount} of ${ts.total} tags scored</span>
+        <span><b class="font-semibold text-zinc-800 dark:text-zinc-200">Expected ${f.expected}%</b></span>
+        ${f.notInTagger.length ? `<span class="text-amber-700 dark:text-amber-300">Not in the tagger's list (not counted): ${esc(f.notInTagger.join(', '))}</span>` : ''}
+      </div>`;
 
     const issues = f.issues.length ? `
       <ul class="space-y-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
@@ -918,8 +1043,9 @@
 
     return `
       <div class="mt-3 space-y-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs dark:border-zinc-800 dark:bg-zinc-950/60">
+        ${measures}
         ${issues}
-        ${section('Expressive', `${p.eCount} of ${s.expressiveTotal} scored${p.special ? ' · special use, not required' : ` · ${s.expressiveTarget} counts as full`}`, expressiveBody || '<span class="text-zinc-400">None</span>')}
+        ${section('Expressive', `${p.eCount} of ${s.expressiveTotal} scored${p.special ? ' · special use, not required' : ` · ${s.expressiveTarget} counts as full on Expected`}`, expressiveBody || '<span class="text-zinc-400">None</span>')}
         ${section('Quality', `${p.qHave} of ${p.qTotal}`, qualityBody || '<span class="text-zinc-400">None</span>')}
         ${section('Classification', p.special ? 'special use' : expectedText, classificationBody)}
         ${other.length ? section('Other', '', other.map((t) => chip(t, trimSlash(t.path))).join('')) : ''}
@@ -929,9 +1055,10 @@
   function renderStatus() {
     const el = $('#status');
     const meta = state.meta;
-    const sources = `Sources: <a class="underline underline-offset-2" href="${META_URL}" target="_blank" rel="noopener">fonts.google.com/metadata/fonts</a> and <a class="underline underline-offset-2" href="${CSV_URL}" target="_blank" rel="noopener">families.csv</a>.`;
-    if (!meta) { el.innerHTML = sources; return; }
-    el.innerHTML = `${sources}<br>Catalog via ${esc(meta.catalogSource)} · tags via ${esc(meta.tagSource)} · fetched ${relativeTime(meta.fetchedAt)}${meta.fromCache ? ' (cached, refreshes after 24 h)' : ''}.`;
+    const sources = `Sources: <a class="underline underline-offset-2" href="${META_URL}" target="_blank" rel="noopener">fonts.google.com/metadata/fonts</a>, <a class="underline underline-offset-2" href="${CSV_URL}" target="_blank" rel="noopener">families.csv</a> and the <a class="underline underline-offset-2" href="https://github.com/googlefonts/tagger/blob/main/public/tags_metadata.csv" target="_blank" rel="noopener">GF Tagger's tag list</a>.`;
+    if (!meta || !state.model) { el.innerHTML = sources; return; }
+    const ts = state.model.stats.tagger;
+    el.innerHTML = `${sources}<br>Catalog via ${esc(meta.catalogSource)} · tags via ${esc(meta.tagSource)} · tag list via ${esc(ts.source || 'families.csv (tagger list unavailable)')} · fetched ${relativeTime(meta.fetchedAt)}${meta.fromCache ? ' (cached, refreshes after 24 h)' : ''}.`;
   }
 
   // Load each family's css2 stylesheet only when its row scrolls into view.
@@ -1012,14 +1139,16 @@
   }
 
   const csvCell = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-  const statusOf = (f) => (!f.tagged ? 'untagged' : f.coverage === 100 ? 'fully tagged' : 'partly tagged');
+  const statusOf = (f) => (!f.tagged ? 'untagged' : f.expected === 100 ? 'fully tagged' : 'partly tagged');
 
   function exportRecord(f) {
     const p = f.parts;
     return {
       family: f.name,
       category: f.category,
-      coveragePct: f.coverage,
+      taggerPct: Number(f.tagger.toFixed(2)),
+      taggerTags: f.taggerCount,
+      expectedPct: f.expected,
       status: statusOf(f),
       gaps: f.issues.map((i) => ({ type: i.key, label: i.label, detail: i.why })),
       missingQualityTags: p ? p.qMissing : [],
@@ -1039,17 +1168,18 @@
     const stamp = new Date().toISOString().slice(0, 10);
     const base = `untagger-${state.scope === 'all' ? 'all-families' : state.scope === 'partial' ? 'partly-tagged' : 'untagged'}-${stamp}`;
     const names = rows.map((f) => f.name).join('\n') + '\n';
+    const ts = state.model.stats.tagger;
 
     if (kind === 'copy') {
       toast((await copyText(names)) ? `Copied ${fmt.format(rows.length)} ${rows.length === 1 ? 'name' : 'names'}` : 'Copy failed');
     } else if (kind === 'txt') {
       download(base + '.txt', 'text/plain;charset=utf-8', names);
     } else if (kind === 'csv') {
-      const header = ['family', 'category', 'coverage_pct', 'status', 'gaps', 'missing_quality_tags', 'expressive_scored', 'quality_scored', 'classification_tags', 'tag_count', 'date_added', 'specimen_url'];
+      const header = ['family', 'category', 'tagger_pct', 'tagger_tags', 'expected_pct', 'status', 'gaps', 'missing_quality_tags', 'expressive_scored', 'quality_scored', 'classification_tags', 'date_added', 'specimen_url'];
       const lines = rows.map((f) => {
         const r = exportRecord(f);
-        return [r.family, r.category, r.coveragePct, r.status, r.gaps.map((g) => g.label).join('; '), r.missingQualityTags.join('; '),
-          r.expressiveScored, r.qualityScored, r.classificationTags.join('; '), f.tags.length, r.dateAdded, r.specimenUrl].map(csvCell).join(',');
+        return [r.family, r.category, r.taggerPct, `${r.taggerTags}/${ts.total}`, r.expectedPct, r.status, r.gaps.map((g) => g.label).join('; '),
+          r.missingQualityTags.join('; '), r.expressiveScored, r.qualityScored, r.classificationTags.join('; '), r.dateAdded, r.specimenUrl].map(csvCell).join(',');
       });
       download(base + '.csv', 'text/csv;charset=utf-8', [header.join(','), ...lines].join('\n') + '\n');
     } else if (kind === 'json') {
@@ -1057,9 +1187,9 @@
       const payload = {
         generatedAt: new Date().toISOString(),
         dataFetchedAt: state.meta ? new Date(state.meta.fetchedAt).toISOString() : null,
-        sources: { catalog: META_URL, tags: CSV_URL },
-        view: { show: state.scope, search: state.query || null, category: state.category || null, gaps: state.issue || null, coverage: state.coverage || null, sort: state.sort },
-        totals: { catalog: t.catalog, tagged: t.tagged, fullyTagged: t.full, partlyTagged: t.partial, untagged: t.untagged },
+        sources: { catalog: META_URL, tags: CSV_URL, taggerTagList: ts.source || 'families.csv' },
+        view: { show: state.scope, measure: state.measure, search: state.query || null, category: state.category || null, gaps: state.issue || null, taggerPct: state.tpct || null, expectedPct: state.epct || null, sort: state.sort },
+        totals: { catalog: t.catalog, tagged: t.tagged, fullyTaggedExpected: t.expectedFull, partlyTagged: t.partial, untagged: t.untagged, taggerTagCount: ts.total, taggerCompletenessPct: Number(ts.completeness.toFixed(3)) },
         count: rows.length,
         families: rows.map(exportRecord),
       };
@@ -1106,6 +1236,8 @@
     btn.addEventListener('click', () => update({ scope: btn.dataset.scope })));
   document.querySelectorAll('button[data-view]').forEach((btn) =>
     btn.addEventListener('click', () => update({ view: btn.dataset.view })));
+  document.querySelectorAll('button[data-measure]').forEach((btn) =>
+    btn.addEventListener('click', () => update({ measure: btn.dataset.measure })));
 
   let searchTimer;
   $('#search').addEventListener('input', (e) => {
@@ -1114,9 +1246,10 @@
   });
   $('#category').addEventListener('change', (e) => update({ category: e.target.value }));
   $('#issue').addEventListener('change', (e) => update({ issue: e.target.value }));
-  $('#coverage').addEventListener('change', (e) => update({ coverage: e.target.value }));
+  $('#tpct').addEventListener('change', (e) => update({ tpct: e.target.value }));
+  $('#epct').addEventListener('change', (e) => update({ epct: e.target.value }));
   $('#sort').addEventListener('change', (e) => update({ sort: e.target.value }));
-  $('#reset').addEventListener('click', () => update({ query: '', category: '', issue: '', coverage: '' }));
+  $('#reset').addEventListener('click', () => update({ query: '', category: '', issue: '', tpct: '', epct: '' }));
   $('#sample').addEventListener('input', (e) => {
     state.sample = e.target.value;
     document.querySelectorAll('#list .preview').forEach((p) => {
@@ -1148,7 +1281,7 @@
 
     const tag = e.target.closest('[data-tag]');
     if (tag) {
-      update({ query: tag.dataset.tag, scope: 'all', issue: '', coverage: '' });
+      update({ query: tag.dataset.tag, scope: 'all', issue: '', tpct: '', epct: '' });
       $('#list').scrollIntoView({ behavior: 'smooth', block: 'start' });
       toast(tag.dataset.tag.startsWith('!') ? `Families without ${tag.dataset.tag.slice(1)}` : `Families tagged ${tag.dataset.tag}`);
       return;
