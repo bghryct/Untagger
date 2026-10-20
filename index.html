@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Untagged Google Fonts</title>
+<title>Untagger · Google Fonts tag coverage</title>
+<meta name="description" content="Tag coverage for every Google Fonts family: what's untagged, what's partly tagged, and which tags are missing." />
 <script>
   // Apply the saved/system theme before first paint to avoid a flash.
   (function () {
@@ -32,44 +33,55 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
 <style>
-  .preview { font-size: 1.625rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .preview { font-size: 1.5rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body[data-view="compact"] .preview, body[data-view="compact"] #sample { display: none; }
   .skeleton { background: linear-gradient(90deg, rgba(127,127,127,.08), rgba(127,127,127,.18), rgba(127,127,127,.08)); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
   @keyframes shimmer { to { background-position: -200% 0; } }
   @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
   select { background-image: none; }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
 </style>
 <style type="text/tailwindcss">
+  @layer components {
+  .btn { @apply inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800; }
+  .field { @apply h-10 w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none ring-indigo-500/40 placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-indigo-500; }
   .export-btn { @apply h-8 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800; }
-  .scope-btn[aria-selected="true"] { @apply bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900; }
-  .scope-btn[aria-selected="false"] { @apply text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100; }
-  .row-action { @apply inline-flex h-8 items-center gap-1 rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-100; }
+  .seg { @apply inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 text-sm dark:border-zinc-800 dark:bg-zinc-900; }
+  .seg > button { @apply whitespace-nowrap rounded-md px-2.5 py-1.5 font-medium transition sm:px-3; }
+  .seg > button[aria-selected="true"], .seg > button[aria-pressed="true"] { @apply bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900; }
+  .seg > button[aria-selected="false"], .seg > button[aria-pressed="false"] { @apply text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100; }
+  .row-action { @apply inline-flex h-7 items-center gap-1 rounded-md border border-zinc-200 px-2 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-100; }
   .chip { @apply inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium; }
+  .chip-muted { @apply bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300; }
+  .chip-warn { @apply bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300; }
+  .chip-bad { @apply bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300; }
+  .tag-chip { @apply inline-flex items-center gap-1 rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px] text-zinc-700 transition hover:border-indigo-400 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-indigo-400 dark:hover:text-indigo-300; }
+  .tag-chip-missing { @apply border-dashed bg-transparent text-zinc-400 dark:bg-transparent dark:text-zinc-500; }
+  .tag-chip-warn { @apply border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300; }
+  .code { @apply font-mono text-[12px] text-zinc-700 dark:text-zinc-300; }
+  }
 </style>
 </head>
-<body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
-<div class="mx-auto max-w-5xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+<body data-view="previews" class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+<div class="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
 
   <!-- Header -->
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div class="min-w-0">
-      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Untagged Google Fonts</h1>
+      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Untagger</h1>
       <p class="mt-1.5 max-w-xl text-sm text-zinc-500 dark:text-zinc-400">
-        Catalog families with no entry in
+        Tag coverage for every Google Fonts family, from
         <a class="underline decoration-zinc-300 underline-offset-2 hover:text-zinc-900 dark:decoration-zinc-700 dark:hover:text-zinc-100" href="https://github.com/google/fonts/blob/main/tags/all/families.csv" target="_blank" rel="noopener">google/fonts · tags/all/families.csv</a>.
       </p>
     </div>
     <div class="flex items-center gap-2">
-      <a href="https://googlefonts.github.io/tagger/" target="_blank" rel="noopener"
-        class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
-        Open tagger <span aria-hidden="true">↗</span>
-      </a>
-      <button id="refresh" type="button"
-        class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+      <a class="btn" href="https://googlefonts.github.io/tagger/" target="_blank" rel="noopener">Open tagger <span aria-hidden="true">↗</span></a>
+      <button id="refresh" type="button" class="btn">
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
         <span id="refresh-label">Refresh</span>
       </button>
-      <button id="theme" type="button" aria-label="Toggle dark mode"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 shadow-sm transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800">
+      <button id="theme" type="button" aria-label="Toggle dark mode" class="btn w-9 justify-center px-0">
         <svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       </button>
@@ -77,18 +89,26 @@
   </header>
 
   <!-- Metrics -->
-  <section class="mt-8 grid grid-cols-3 gap-2 sm:gap-3" aria-label="Summary">
+  <section class="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3" aria-label="Summary">
     <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:text-xs dark:text-zinc-400">Catalog</div>
       <div id="m-total" class="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">—</div>
+      <div id="m-avg" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
     </div>
     <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:text-xs dark:text-zinc-400">Tagged</div>
       <div id="m-tagged" class="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">—</div>
+      <div id="m-full" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
+    </div>
+    <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:text-xs dark:text-zinc-400">Partly tagged</div>
+      <div id="m-partial" class="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">—</div>
+      <div id="m-flagged" class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">&nbsp;</div>
     </div>
     <div class="rounded-xl border border-indigo-300 bg-indigo-50 p-3 ring-1 ring-indigo-300 sm:p-4 dark:border-indigo-500/50 dark:bg-indigo-500/10 dark:ring-indigo-500/40">
       <div class="text-[11px] font-semibold uppercase tracking-wider text-indigo-700 sm:text-xs dark:text-indigo-300">Untagged</div>
       <div id="m-untagged" class="mt-1 text-2xl font-semibold tabular-nums text-indigo-700 sm:text-3xl dark:text-indigo-300">—</div>
+      <div class="mt-0.5 text-xs text-indigo-700/70 dark:text-indigo-300/70">no rows in families.csv</div>
     </div>
   </section>
 
@@ -98,45 +118,57 @@
   <!-- Controls -->
   <section class="mt-8 space-y-3" aria-label="Filters">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <div role="tablist" aria-label="Scope" class="inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <button role="tab" data-scope="untagged" class="scope-btn rounded-md px-3 py-1.5 font-medium transition">Untagged <span class="scope-count tabular-nums opacity-60"></span></button>
-        <button role="tab" data-scope="partial" class="scope-btn rounded-md px-3 py-1.5 font-medium transition">Partly tagged <span class="scope-count tabular-nums opacity-60"></span></button>
+      <div id="scopes" role="tablist" aria-label="Show" class="seg">
+        <button role="tab" data-scope="all">All <span class="scope-count tabular-nums opacity-60"></span></button>
+        <button role="tab" data-scope="partial">Partly tagged <span class="scope-count tabular-nums opacity-60"></span></button>
+        <button role="tab" data-scope="untagged">Untagged <span class="scope-count tabular-nums opacity-60"></span></button>
       </div>
-      <label class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-        Sort
-        <select id="sort" class="h-8 rounded-lg border border-zinc-200 bg-white px-2 text-sm text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
-          <option value="newest">Newest added</option>
-          <option value="name">A–Z</option>
-          <option value="popular">Most popular</option>
-        </select>
-      </label>
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+          Sort
+          <select id="sort" class="h-8 rounded-lg border border-zinc-200 bg-white px-2 text-sm text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
+            <option value="least">Least tagged</option>
+            <option value="most">Most tagged</option>
+            <option value="newest">Newest added</option>
+            <option value="name">A–Z</option>
+            <option value="popular">Most popular</option>
+          </select>
+        </label>
+        <div class="seg" role="group" aria-label="Layout">
+          <button type="button" data-view="previews">Previews</button>
+          <button type="button" data-view="compact">Compact</button>
+        </div>
+      </div>
     </div>
 
-    <p id="partial-legend" class="hidden text-sm text-zinc-500 dark:text-zinc-400">
-      Families that have some tags but are missing a whole group: no <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Expressive</span> tags,
-      no <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Quality</span> tags, or no <em>classification</em> tag, meaning nothing under
-      <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Sans</span>, <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Serif</span>,
-      <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Slab</span>, <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Script</span>,
-      <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Theme</span>, <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Monospace</span> or
-      <span class="font-mono text-[13px] text-zinc-700 dark:text-zinc-300">/Special use</span> (e.g. Arimo has no <span class="font-mono text-[13px]">/Sans/…</span> tag).
-    </p>
-
-    <div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_12rem] lg:grid-cols-[minmax(0,1fr)_12rem_16rem]">
-      <div class="relative">
+    <div class="grid gap-2 sm:grid-cols-3 lg:grid-cols-[minmax(0,1fr)_14rem_15rem_9.5rem]">
+      <div class="relative sm:col-span-3 lg:col-span-1">
         <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" type="search" placeholder="Search families  ( / )" autocomplete="off" spellcheck="false"
-          class="h-10 w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 text-sm outline-none ring-indigo-500/40 placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-indigo-500" />
+        <input id="search" type="search" class="field pl-9" autocomplete="off" spellcheck="false"
+          placeholder="Search names, /tags or !/tags"
+          title="Type a family name. Start with / to find families that have a tag (/Sans/Humanist), or !/ for families without it (!/Expressive/Calm). Press / anywhere to jump here." />
       </div>
-      <select id="category" aria-label="Category"
-        class="h-10 rounded-lg border border-zinc-200 bg-white px-3 text-sm outline-none ring-indigo-500/40 focus:border-indigo-400 focus:ring-2 dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-indigo-500"></select>
-      <input id="sample" type="text" aria-label="Preview text" value="The quick brown fox jumps over the lazy dog"
-        class="h-10 rounded-lg border border-zinc-200 bg-white px-3 text-sm outline-none ring-indigo-500/40 focus:border-indigo-400 focus:ring-2 sm:col-span-2 lg:col-span-1 dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-indigo-500" />
+      <select id="category" class="field" aria-label="Category"></select>
+      <select id="issue" class="field" aria-label="Tagging gaps"></select>
+      <select id="coverage" class="field" aria-label="Coverage"></select>
     </div>
+    <input id="sample" type="text" class="field" aria-label="Preview text" value="The quick brown fox jumps over the lazy dog" />
 
-    <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
-      <p id="count" class="text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite"></p>
+    <details id="legend" class="group rounded-xl border border-zinc-200 bg-white text-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <summary class="flex cursor-pointer select-none items-center justify-between gap-2 px-4 py-2.5 text-zinc-600 dark:text-zinc-300">
+        <span>How the tagging percentage works</span>
+        <svg class="h-4 w-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div id="legend-body" class="space-y-2 border-t border-zinc-200 px-4 py-3 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400"></div>
+    </details>
+
+    <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <p id="count" class="text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite"></p>
+        <button id="reset" type="button" class="hidden text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">Clear filters</button>
+      </div>
       <div class="flex flex-wrap gap-1.5" aria-label="Export">
-        <button data-export="copy" class="export-btn">Copy list</button>
+        <button data-export="copy" class="export-btn">Copy names</button>
         <button data-export="txt" class="export-btn">.txt</button>
         <button data-export="csv" class="export-btn">.csv</button>
         <button data-export="json" class="export-btn">.json</button>
@@ -151,10 +183,9 @@
 </div>
 
 <div id="toast" role="status" aria-live="polite"
-  class="pointer-events-none fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-2 rounded-lg bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white opacity-0 shadow-lg transition dark:bg-zinc-100 dark:text-zinc-900"></div>
+  class="pointer-events-none fixed bottom-6 left-1/2 z-10 -translate-x-1/2 translate-y-2 rounded-lg bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white opacity-0 shadow-lg transition dark:bg-zinc-100 dark:text-zinc-900"></div>
 
 <input id="file-input" type="file" accept=".json,.csv,.txt,application/json,text/csv" multiple class="hidden" />
-
 
 <script>
 (() => {
@@ -165,6 +196,7 @@
   // ---------------------------------------------------------------------------
   const META_URL = 'https://fonts.google.com/metadata/fonts';
   const CSV_URL = 'https://raw.githubusercontent.com/google/fonts/main/tags/all/families.csv';
+  const TAGGER_URL = 'https://googlefonts.github.io/tagger/';
 
   const proxied = (url) => [
     { label: 'allorigins.win proxy', url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) },
@@ -185,30 +217,61 @@
     ...proxied(CSV_URL),
   ];
 
-  const CACHE_KEY = 'gfu:data:v2';
+  const CACHE_KEY = 'gfu:data:v3';
   const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
   const COOLDOWN_KEY = 'gfu:lastRefresh';
   const COOLDOWN_MS = 30 * 1000;
   const FETCH_TIMEOUT_MS = 15 * 1000;
+  const PAGE_SIZE = 100;
+
+  // Coverage rules (see the "How the tagging percentage works" panel).
+  const THIN_EXPRESSIVE = 3;            // this many Expressive tags or fewer is flagged
+  const EXPECTED_TAG_SHARE = 0.9;       // a Quality tag is expected if 90%+ of tagged families have it
 
   const CATEGORIES = ['Sans Serif', 'Serif', 'Display', 'Handwriting', 'Monospace'];
-  // A family "has a classification" if it has any tag under one of these groups.
   const CLASSIFICATION_GROUPS = ['Sans', 'Serif', 'Slab', 'Script', 'Theme', 'Monospace', 'Special use', 'Not text'];
-  const MISSING_LABELS = { Expressive: 'No /Expressive tags', Quality: 'No /Quality tags', Classification: 'No classification tag' };
-  const MISSING_HINTS = {
-    Expressive: 'No tags under /Expressive (Calm, Playful, Business…)',
-    Quality: 'No tags under /Quality (Concept, Drawing, Spacing, Wordspace)',
-    Classification: 'No tag under /Sans, /Serif, /Slab, /Script, /Theme, /Monospace or /Special use',
+  const ANY_CLASSIFICATION = { groups: CLASSIFICATION_GROUPS, label: 'classification' };
+  const EXPECTED_CLASSIFICATION = {
+    'Sans Serif': { groups: ['Sans'], label: '/Sans' },
+    'Serif': { groups: ['Serif', 'Slab'], label: '/Serif or /Slab' },
+    'Handwriting': { groups: ['Script'], label: '/Script' },
+    'Monospace': { groups: ['Monospace'], label: '/Monospace' },
   };
+  const expectedFor = (category) => EXPECTED_CLASSIFICATION[category] || ANY_CLASSIFICATION;
 
-  const TAGGER_URL = 'https://googlefonts.github.io/tagger/';
+  const SCOPES = {
+    all: { noun: 'families', test: () => true },
+    partial: { noun: 'partly tagged', test: (f) => f.tagged && f.coverage < 100 },
+    untagged: { noun: 'untagged', test: (f) => !f.tagged },
+  };
+  const ISSUE_FILTERS = [
+    { v: '', label: 'Any gaps', test: () => true },
+    { v: 'flagged', label: 'Has flagged gaps', test: (f) => f.issues.length > 0 },
+    { v: 'quality', label: 'Quality gap', test: (f) => hasIssue(f, 'quality') },
+    { v: 'expressive', label: 'Few Expressive tags', test: (f) => hasIssue(f, 'expressive') },
+    { v: 'classification', label: 'No classification tag', test: (f) => hasIssue(f, 'classification') },
+    { v: 'clean', label: 'No flagged gaps', test: (f) => f.issues.length === 0 },
+  ];
+  const COVERAGE_FILTERS = [
+    { v: '', label: 'Any %', test: () => true },
+    { v: '0', label: '0%', test: (p) => p === 0 },
+    { v: '1-49', label: '1–49%', test: (p) => p >= 1 && p <= 49 },
+    { v: '50-79', label: '50–79%', test: (p) => p >= 50 && p <= 79 },
+    { v: '80-99', label: '80–99%', test: (p) => p >= 80 && p <= 99 },
+    { v: '100', label: '100%', test: (p) => p === 100 },
+  ];
+  const hasIssue = (f, key) => f.issues.some((i) => i.key === key);
 
   // ---------------------------------------------------------------------------
   // Small helpers
   // ---------------------------------------------------------------------------
   const $ = (sel) => document.querySelector(sel);
   const fmt = new Intl.NumberFormat();
+  const pct = (x) => (x >= 0.995 && x < 1 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const groupOf = (path) => path.split('/')[1] || '';
+  const leaf = (path) => path.split('/').pop();
+  const trimSlash = (path) => path.replace(/^\//, '');
 
   const store = {
     get(key) { try { return localStorage.getItem(key); } catch (e) { return null; } },
@@ -317,68 +380,220 @@
     return rows;
   }
 
-  // Returns Map(lowercased family -> Set of top-level tag groups, e.g. "Expressive").
+  // Compact, cacheable form: { vocab: [tagPath], fam: { lowercased family: [[vocabIndex, score, isVariable]] } }.
+  // Variable-font tags have one row per axis position; they collapse to a "min–max" score.
   function parseTags(text) {
-    const groups = new Map();
+    const vocabIndex = new Map();
+    const acc = new Map();
     for (const r of parseCSV(text)) {
       const family = (r[0] || '').trim();
-      if (!family || family.toLowerCase() === 'family') continue;
+      const path = (r[2] || '').trim();
+      if (!family || !path.startsWith('/') || family.toLowerCase() === 'family') continue;
+      if (!vocabIndex.has(path)) vocabIndex.set(path, vocabIndex.size);
       const key = family.toLowerCase();
-      if (!groups.has(key)) groups.set(key, new Set());
-      const group = (r[2] || '').split('/')[1];
-      if (group) groups.get(key).add(group.trim());
+      if (!acc.has(key)) acc.set(key, new Map());
+      const tags = acc.get(key);
+      if (!tags.has(path)) tags.set(path, { scores: [], vf: false });
+      const t = tags.get(path);
+      const score = parseFloat(r[3]);
+      if (!Number.isNaN(score)) t.scores.push(score);
+      if ((r[1] || '').trim()) t.vf = true;
     }
-    if (groups.size < 100) throw new Error('unexpected tags format');
-    return groups;
-  }
-
-  function buildModel(catalog, groups) {
-    const untagged = [], partial = [];
-    for (const f of catalog) {
-      const g = groups.get(f.name.toLowerCase());
-      if (!g) { untagged.push({ ...f, missing: [] }); continue; }
-      const missing = [];
-      if (!g.has('Expressive')) missing.push('Expressive');
-      if (!g.has('Quality')) missing.push('Quality');
-      if (!CLASSIFICATION_GROUPS.some((c) => g.has(c))) missing.push('Classification');
-      if (missing.length) partial.push({ ...f, missing });
+    if (acc.size < 100) throw new Error('unexpected tags format');
+    const fam = {};
+    for (const [key, tags] of acc) {
+      fam[key] = [...tags].map(([path, t]) => {
+        const lo = Math.min(...t.scores), hi = Math.max(...t.scores);
+        const score = !t.scores.length ? '' : lo === hi ? String(lo) : `${lo}–${hi}`;
+        return [vocabIndex.get(path), score, t.vf ? 1 : 0];
+      });
     }
-    return { total: catalog.length, tagged: catalog.length - untagged.length, untagged, partial };
+    return { vocab: [...vocabIndex.keys()], fam };
   }
 
   // ---------------------------------------------------------------------------
-  // State
+  // Coverage model
   // ---------------------------------------------------------------------------
+  function buildModel(catalog, tagData) {
+    const { vocab, fam } = tagData;
+    const families = catalog.map((c) => {
+      const tags = (fam[c.name.toLowerCase()] || []).map(([i, score, vf]) => ({ path: vocab[i], group: groupOf(vocab[i]), score, vf: !!vf }));
+      return { ...c, nameLower: c.name.toLowerCase(), tagged: tags.length > 0, tags, tagPathsLower: tags.map((t) => t.path.toLowerCase()) };
+    });
+    const tagged = families.filter((f) => f.tagged);
+    const n = Math.max(tagged.length, 1);
+
+    // How common each tag is across tagged families.
+    const freq = new Map();
+    tagged.forEach((f) => f.tags.forEach((t) => freq.set(t.path, (freq.get(t.path) || 0) + 1)));
+    const share = (path) => (freq.get(path) || 0) / n;
+    const byShare = (a, b) => share(b) - share(a) || a.localeCompare(b);
+    const expressiveVocab = vocab.filter((p) => groupOf(p) === 'Expressive').sort(byShare);
+    const qualityExpected = vocab.filter((p) => groupOf(p) === 'Quality' && share(p) >= EXPECTED_TAG_SHARE).sort();
+
+    const isSpecial = (f) => f.tags.some((t) => t.group === 'Special use');
+    const expressiveCount = (f) => f.tags.filter((t) => t.group === 'Expressive').length;
+    const hasExpected = (f) => f.tags.some((t) => expectedFor(f.category).groups.includes(t.group));
+    const counts = tagged.map(expressiveCount).sort((a, b) => a - b);
+    const quantile = (q) => (counts.length ? counts[Math.floor((counts.length - 1) * q)] : 0);
+
+    const stats = {
+      taggedCount: tagged.length,
+      expressiveTotal: expressiveVocab.length,
+      expressiveTarget: Math.max(1, quantile(0.25)), // reached by 3 in 4 tagged families
+      expressiveMedian: quantile(0.5),
+      qualityExpected,
+      qualityFullShare: tagged.filter((f) => qualityExpected.every((p) => f.tags.some((t) => t.path === p))).length / n,
+      classificationShare: {},
+    };
+    const classificationShare = (category) => {
+      if (!(category in stats.classificationShare)) {
+        const pool = tagged.filter((f) => f.category === category && !isSpecial(f));
+        stats.classificationShare[category] = pool.length ? pool.filter(hasExpected).length / pool.length : 0;
+      }
+      return stats.classificationShare[category];
+    };
+    CATEGORIES.forEach(classificationShare);
+
+    for (const f of families) {
+      f.issues = [];
+      if (!f.tagged) {
+        f.coverage = 0;
+        f.parts = null;
+        f.issues.push({ key: 'untagged', label: 'Untagged', why: 'No rows in families.csv yet.' });
+        continue;
+      }
+      const have = new Set(f.tags.map((t) => t.path));
+      const special = isSpecial(f);
+      const eCount = expressiveCount(f);
+      const qMissing = qualityExpected.filter((p) => !have.has(p));
+      const expected = expectedFor(f.category);
+      const classified = special || hasExpected(f);
+
+      const e = special ? 1 : Math.min(eCount / stats.expressiveTarget, 1);
+      const q = qualityExpected.length ? 1 - qMissing.length / qualityExpected.length : 1;
+      const c = classified ? 1 : 0;
+      f.coverage = e === 1 && q === 1 && c === 1 ? 100 : Math.min(99, Math.round(((e + q + c) / 3) * 100));
+      f.parts = {
+        special, eCount, qMissing,
+        qHave: qualityExpected.length - qMissing.length,
+        qTotal: qualityExpected.length,
+        classification: f.tags.filter((t) => CLASSIFICATION_GROUPS.includes(t.group)).map((t) => t.path).sort(),
+        expected, classified,
+        notScored: expressiveVocab.filter((p) => !have.has(p)),
+      };
+
+      if (qMissing.length) {
+        f.issues.push({
+          key: 'quality',
+          label: qMissing.length === qualityExpected.length ? 'No /Quality tags'
+            : qMissing.length === 1 ? `Missing ${qMissing[0]}` : `Missing ${qMissing.length} /Quality tags`,
+          why: `Missing ${qMissing.join(', ')}. ${pct(stats.qualityFullShare)} of tagged families have all ${qualityExpected.length}.`,
+          missed: qMissing,
+        });
+      }
+      if (!special && eCount <= THIN_EXPRESSIVE) {
+        f.issues.push({
+          key: 'expressive',
+          label: eCount === 0 ? 'No /Expressive tags' : `Only ${eCount} /Expressive tag${eCount === 1 ? '' : 's'}`,
+          why: `3 in 4 tagged families have ${stats.expressiveTarget} or more (median ${stats.expressiveMedian}).`,
+          missed: ['/Expressive/…'],
+        });
+      }
+      if (!classified) {
+        const share = classificationShare(f.category);
+        f.issues.push({
+          key: 'classification',
+          label: expected === ANY_CLASSIFICATION ? 'No classification tag' : `No ${expected.label} tag`,
+          why: expected === ANY_CLASSIFICATION
+            ? `No tag under /Sans, /Serif, /Slab, /Script, /Theme, /Monospace or /Special use. ${pct(share)} of tagged ${f.category || 'uncategorized'} families have one.`
+            : `${pct(share)} of tagged ${f.category} families have a ${expected.label} tag.`,
+          missed: expected.groups.filter((g) => g !== 'Not text').map((g) => `/${g}/…`),
+        });
+      }
+    }
+
+    stats.share = share;
+    return {
+      families,
+      byName: new Map(families.map((f) => [f.name, f])),
+      expressiveVocab,
+      stats,
+      totals: {
+        catalog: families.length,
+        tagged: tagged.length,
+        full: tagged.filter((f) => f.coverage === 100).length,
+        partial: families.filter(SCOPES.partial.test).length,
+        flagged: tagged.filter((f) => f.issues.length).length,
+        untagged: families.length - tagged.length,
+        avg: families.reduce((s, f) => s + f.coverage, 0) / Math.max(families.length, 1),
+      },
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // State (mirrored into the URL hash so filtered views can be shared)
+  // ---------------------------------------------------------------------------
+  const DEFAULTS = { scope: 'all', query: '', category: '', issue: '', coverage: '', sort: 'least', view: 'previews' };
+  const URL_KEYS = { scope: 'show', query: 'q', category: 'cat', issue: 'gap', coverage: 'pct', sort: 'sort', view: 'layout' };
+  const VALID = {
+    scope: (v) => v in SCOPES,
+    query: () => true,
+    category: (v) => v === '' || CATEGORIES.includes(v),
+    issue: (v) => ISSUE_FILTERS.some((o) => o.v === v),
+    coverage: (v) => COVERAGE_FILTERS.some((o) => o.v === v),
+    sort: (v) => v in SORTERS,
+    view: (v) => v === 'previews' || v === 'compact',
+  };
+
   const state = {
+    ...DEFAULTS,
+    sample: $('#sample').value,
+    limit: PAGE_SIZE,
     model: null,
     meta: null,          // { fetchedAt, catalogSource, tagSource, fromCache }
     loading: false,
-    scope: 'untagged',
-    query: '',
-    category: '',
-    sort: 'newest',
-    sample: $('#sample').value,
     // Partial results kept so a manual file can fill in whichever fetch failed.
     lastCatalog: null,
-    lastGroups: null,
+    lastTags: null,
   };
 
+  function readUrl() {
+    const params = new URLSearchParams(location.hash.slice(1));
+    for (const [key, param] of Object.entries(URL_KEYS)) {
+      const v = params.get(param);
+      state[key] = v !== null && VALID[key](v) ? v : DEFAULTS[key];
+    }
+  }
+
+  function writeUrl() {
+    const params = new URLSearchParams();
+    for (const [key, param] of Object.entries(URL_KEYS)) if (state[key] !== DEFAULTS[key]) params.set(param, state[key]);
+    const hash = params.toString();
+    history.replaceState(null, '', hash ? '#' + hash : location.pathname + location.search);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Loading
+  // ---------------------------------------------------------------------------
   function readCache() {
     try {
       const c = JSON.parse(store.get(CACHE_KEY));
-      if (c && c.model && Array.isArray(c.model.untagged)) return c;
+      if (c && Array.isArray(c.catalog) && c.tags && c.tags.fam) return c;
     } catch (e) {}
     return null;
   }
 
-  function writeCache(model, meta) {
-    store.set(CACHE_KEY, JSON.stringify({ model, ...meta }));
+  function useData(catalog, tags, meta) {
+    state.model = buildModel(catalog, tags);
+    state.meta = meta;
+    render();
   }
 
   async function load({ fresh = false } = {}) {
     const cached = readCache();
     if (!fresh && cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-      setData(cached.model, { ...cached, fromCache: true });
+      useData(cached.catalog, cached.tags, { ...cached, fromCache: true });
       return;
     }
 
@@ -393,13 +608,12 @@
     state.loading = false;
 
     if (cat.status === 'fulfilled') state.lastCatalog = cat.value;
-    if (tags.status === 'fulfilled') state.lastGroups = tags.value;
+    if (tags.status === 'fulfilled') state.lastTags = tags.value;
 
     if (cat.status === 'fulfilled' && tags.status === 'fulfilled') {
       const meta = { fetchedAt: Date.now(), catalogSource: cat.value.source, tagSource: tags.value.source };
-      const model = buildModel(cat.value.data, tags.value.data);
-      writeCache(model, meta);
-      setData(model, { ...meta, fromCache: false });
+      store.set(CACHE_KEY, JSON.stringify({ ...meta, catalog: cat.value.data, tags: tags.value.data }));
+      useData(cat.value.data, tags.value.data, { ...meta, fromCache: false });
       return;
     }
 
@@ -408,7 +622,7 @@
     if (tags.status === 'rejected') failures.push({ what: 'Tags (families.csv)', details: tags.reason.details || [tags.reason.message] });
 
     if (cached) {
-      setData(cached.model, { ...cached, fromCache: true });
+      useData(cached.catalog, cached.tags, { ...cached, fromCache: true });
       showError(`Couldn't refresh, so this is cached data from ${relativeTime(cached.fetchedAt)}.`, failures);
     } else if (state.model) {
       render();
@@ -419,154 +633,297 @@
     }
   }
 
-  function setData(model, meta) {
-    state.model = model;
-    state.meta = meta;
-    render();
-  }
-
-  // Manual fallback: user drops in the files they downloaded themselves.
+  // Manual fallback: user picks the files they downloaded themselves.
   async function loadFiles(files) {
     for (const file of files) {
       const text = await file.text();
       const head = text.replace(/^\uFEFF/, '').trimStart().slice(0, 4);
       try {
         if (head.startsWith('{') || head === ")]}'") state.lastCatalog = { data: parseCatalog(text), source: 'local file (' + file.name + ')' };
-        else state.lastGroups = { data: parseTags(text), source: 'local file (' + file.name + ')' };
+        else state.lastTags = { data: parseTags(text), source: 'local file (' + file.name + ')' };
       } catch (err) {
         toast(`Couldn't read ${file.name}: ${err.message}`);
         return;
       }
     }
-    if (state.lastCatalog && state.lastGroups) {
-      const meta = { fetchedAt: Date.now(), catalogSource: state.lastCatalog.source, tagSource: state.lastGroups.source };
-      const model = buildModel(state.lastCatalog.data, state.lastGroups.data);
-      writeCache(model, meta);
+    if (state.lastCatalog && state.lastTags) {
+      const meta = { fetchedAt: Date.now(), catalogSource: state.lastCatalog.source, tagSource: state.lastTags.source };
+      store.set(CACHE_KEY, JSON.stringify({ ...meta, catalog: state.lastCatalog.data, tags: state.lastTags.data }));
       hideBanner();
-      setData(model, { ...meta, fromCache: false });
+      useData(state.lastCatalog.data, state.lastTags.data, { ...meta, fromCache: false });
     } else {
       toast(state.lastCatalog ? 'Catalog loaded. Now add families.csv' : 'Tags loaded. Now add the catalog JSON');
     }
   }
 
   // ---------------------------------------------------------------------------
-  // View
+  // Filtering & sorting
   // ---------------------------------------------------------------------------
-  function currentRows() {
-    if (!state.model) return [];
-    const q = state.query.trim().toLowerCase();
-    const rows = state.model[state.scope].filter((f) =>
-      (!state.category || f.category === state.category) &&
-      (!q || f.name.toLowerCase().includes(q)));
-    const byName = (a, b) => a.name.localeCompare(b.name);
-    const sorters = {
-      name: byName,
-      newest: (a, b) => (b.added || '').localeCompare(a.added || '') || byName(a, b),
-      popular: (a, b) => (a.popularity ?? Infinity) - (b.popularity ?? Infinity) || byName(a, b),
-    };
-    return rows.sort(sorters[state.sort]);
+  function queryTest(raw) {
+    const s = raw.trim().toLowerCase();
+    if (!s) return () => true;
+    const negate = s.startsWith('!/') || s.startsWith('-/');
+    const tag = negate ? s.slice(1) : s;
+    if (tag.startsWith('/')) return (f) => f.tagPathsLower.some((p) => p.includes(tag)) !== negate;
+    return (f) => f.nameLower.includes(s);
   }
 
-  function render() {
-    const m = state.model;
-    $('#m-total').textContent = m ? fmt.format(m.total) : '—';
-    $('#m-tagged').textContent = m ? fmt.format(m.tagged) : '—';
-    $('#m-untagged').textContent = m ? fmt.format(m.untagged.length) : '—';
+  // `skip` leaves one filter out, so each dropdown can show counts for its own options.
+  function filtered(skip) {
+    const q = queryTest(state.query);
+    // Gap and coverage filters are hidden for untagged families (all 0%, no tags), so ignore them there.
+    const untaggedOnly = state.scope === 'untagged';
+    const issue = untaggedOnly ? ISSUE_FILTERS[0] : ISSUE_FILTERS.find((o) => o.v === state.issue);
+    const cov = untaggedOnly ? COVERAGE_FILTERS[0] : COVERAGE_FILTERS.find((o) => o.v === state.coverage);
+    return state.model.families.filter((f) =>
+      SCOPES[state.scope].test(f) &&
+      (skip === 'category' || !state.category || f.category === state.category) &&
+      (skip === 'issue' || issue.test(f)) &&
+      (skip === 'coverage' || cov.test(f.coverage)) &&
+      q(f));
+  }
 
-    document.querySelectorAll('.scope-btn').forEach((btn) => {
+  const byName = (a, b) => a.name.localeCompare(b.name);
+  const byNewest = (a, b) => (b.added || '').localeCompare(a.added || '');
+  const SORTERS = {
+    least: (a, b) => a.coverage - b.coverage || b.issues.length - a.issues.length || byNewest(a, b) || byName(a, b),
+    most: (a, b) => b.coverage - a.coverage || b.tags.length - a.tags.length || byName(a, b),
+    newest: (a, b) => byNewest(a, b) || byName(a, b),
+    name: byName,
+    popular: (a, b) => (a.popularity ?? Infinity) - (b.popularity ?? Infinity) || byName(a, b),
+  };
+
+  const currentRows = () => (state.model ? filtered().sort(SORTERS[state.sort]) : []);
+
+  // ---------------------------------------------------------------------------
+  // View
+  // ---------------------------------------------------------------------------
+  function render() {
+    document.body.dataset.view = state.view;
+    document.querySelectorAll('[data-view]').forEach((b) => b.tagName === 'BUTTON' && b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+    $('#sort').value = state.sort;
+    if ($('#search').value !== state.query) $('#search').value = state.query;
+
+    const m = state.model;
+    const t = m && m.totals;
+    $('#m-total').textContent = t ? fmt.format(t.catalog) : '—';
+    $('#m-avg').textContent = t ? `${Math.round(t.avg)}% tagged on average` : '\u00a0';
+    $('#m-tagged').textContent = t ? fmt.format(t.tagged) : '—';
+    $('#m-full').textContent = t ? `${fmt.format(t.full)} at 100%` : '\u00a0';
+    $('#m-partial').textContent = t ? fmt.format(t.partial) : '—';
+    $('#m-flagged').textContent = t ? `${fmt.format(t.flagged)} with flagged gaps` : '\u00a0';
+    $('#m-untagged').textContent = t ? fmt.format(t.untagged) : '—';
+
+    document.querySelectorAll('[data-scope]').forEach((btn) => {
       const scope = btn.dataset.scope;
       btn.setAttribute('aria-selected', String(scope === state.scope));
-      btn.querySelector('.scope-count').textContent = m ? fmt.format(m[scope].length) : '';
+      btn.querySelector('.scope-count').textContent = m ? fmt.format(m.families.filter(SCOPES[scope].test).length) : '';
     });
 
-    $('#partial-legend').classList.toggle('hidden', state.scope !== 'partial');
-    renderCategoryOptions();
+    renderFilterOptions();
+    renderLegend();
+    renderList();
+    renderStatus();
+    writeUrl();
+  }
 
-    const rows = currentRows();
+  function renderFilterOptions() {
+    const m = state.model;
+    const optionList = (sel, options, current, countFor) => {
+      sel.innerHTML = options.map((o) =>
+        `<option value="${esc(o.v)}">${esc(o.label)}${m ? ` (${fmt.format(countFor(o))})` : ''}</option>`).join('');
+      sel.value = current;
+    };
+    const catPool = m ? filtered('category') : [];
+    optionList($('#category'), [{ v: '', label: 'All categories' }, ...CATEGORIES.map((c) => ({ v: c, label: c }))], state.category,
+      (o) => (o.v ? catPool.filter((f) => f.category === o.v).length : catPool.length));
+    const issuePool = m ? filtered('issue') : [];
+    optionList($('#issue'), ISSUE_FILTERS, state.issue, (o) => issuePool.filter(o.test).length);
+    const covPool = m ? filtered('coverage') : [];
+    optionList($('#coverage'), COVERAGE_FILTERS, state.coverage, (o) => covPool.filter((f) => o.test(f.coverage)).length);
+
+    $('#issue').classList.toggle('hidden', state.scope === 'untagged');
+    $('#coverage').classList.toggle('hidden', state.scope === 'untagged');
+    const active = state.query || state.category || state.issue || state.coverage;
+    $('#reset').classList.toggle('hidden', !active);
+  }
+
+  function renderLegend() {
+    const m = state.model;
+    if (!m) { $('#legend-body').innerHTML = '<p>Loads with the data.</p>'; return; }
+    const s = m.stats;
+    const code = (x) => `<span class="code">${esc(x)}</span>`;
+    const share = (cat) => pct(s.classificationShare[cat] || 0);
+    $('#legend-body').innerHTML = `
+      <p>Each family's percentage is the average of three parts. 100% means it's tagged to the usual standard, and 0% means it has no tags at all.</p>
+      <ul class="list-disc space-y-1 pl-5">
+        <li><b class="font-medium text-zinc-800 dark:text-zinc-200">Quality</b>: how many of the ${s.qualityExpected.length} ${code('/Quality')} tags are scored. ${pct(s.qualityFullShare)} of tagged families have all of them.</li>
+        <li><b class="font-medium text-zinc-800 dark:text-zinc-200">Expressive</b>: ${code('/Expressive')} tags scored, out of ${s.expressiveTarget}. Taggers pick these selectively, so nobody is expected to have all ${s.expressiveTotal}; 3 in 4 tagged families have ${s.expressiveTarget} or more (median ${s.expressiveMedian}).</li>
+        <li><b class="font-medium text-zinc-800 dark:text-zinc-200">Classification</b>: whether it has a tag in the group its category calls for. Sans Serif → ${code('/Sans')} (${share('Sans Serif')} do), Serif → ${code('/Serif')} or ${code('/Slab')} (${share('Serif')}), Handwriting → ${code('/Script')} (${share('Handwriting')}), Monospace → ${code('/Monospace')} (${share('Monospace')}), Display → any of ${code('/Sans')}, ${code('/Serif')}, ${code('/Slab')}, ${code('/Script')}, ${code('/Theme')}, ${code('/Monospace')}, ${code('/Special use')} (${share('Display')}).</li>
+      </ul>
+      <p><b class="font-medium text-zinc-800 dark:text-zinc-200">Flagged gaps</b> are the likely misses: a missing Quality tag, ${THIN_EXPRESSIVE} or fewer Expressive tags, or no classification tag. Families with a ${code('/Special use')} tag (barcodes, redaction, symbols) get full marks for Expressive and Classification.</p>
+      <p>Open a family's <b class="font-medium text-zinc-800 dark:text-zinc-200">Tags</b> panel to see every score and the Expressive tags it hasn't been scored on. Click any tag to list the families that have it, or a dashed one to list the families that don't.</p>`;
+  }
+
+  function renderList() {
+    const m = state.model;
     const list = $('#list');
+    const rows = currentRows();
     document.querySelectorAll('.export-btn').forEach((b) => (b.disabled = !rows.length));
 
     if (state.loading && !m) {
       $('#count').textContent = 'Loading catalog and tags…';
       list.classList.remove('hidden');
-      list.innerHTML = Array.from({ length: 5 }, () => `
+      list.innerHTML = Array.from({ length: 6 }, () => `
         <li class="px-4 py-4 sm:px-5">
           <div class="skeleton h-4 w-40 rounded"></div>
-          <div class="skeleton mt-3 h-6 w-3/4 rounded"></div>
+          <div class="skeleton mt-3 h-5 w-2/3 rounded"></div>
         </li>`).join('');
-      renderStatus();
       return;
     }
-
     if (!m) {
       $('#count').textContent = '';
       list.innerHTML = '';
       list.classList.add('hidden');
-      renderStatus();
       return;
     }
     list.classList.remove('hidden');
 
-    const scopeTotal = m[state.scope].length;
-    const noun = state.scope === 'untagged' ? 'untagged' : 'partly tagged';
+    const scopeTotal = m.families.filter(SCOPES[state.scope].test).length;
+    const noun = SCOPES[state.scope].noun;
     $('#count').textContent = rows.length === scopeTotal
-      ? `${fmt.format(scopeTotal)} ${noun} ${scopeTotal === 1 ? 'family' : 'families'}`
-      : `Showing ${fmt.format(rows.length)} of ${fmt.format(scopeTotal)} ${noun}`;
+      ? `${fmt.format(scopeTotal)} ${noun}`
+      : `${fmt.format(rows.length)} of ${fmt.format(scopeTotal)} ${noun}`;
 
     if (!rows.length) {
       const msg = scopeTotal === 0
-        ? (state.scope === 'untagged' ? 'Every catalog family has at least one tag.' : 'No partly tagged families.')
+        ? (state.scope === 'untagged' ? 'Every catalog family has at least one tag.' : 'Nothing here: every tagged family is at 100%.')
         : 'No families match these filters.';
       list.innerHTML = `<li class="px-5 py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">${esc(msg)}</li>`;
-      renderStatus();
       return;
     }
 
-    list.innerHTML = rows.map(rowHtml).join('');
+    const shown = rows.slice(0, state.limit);
+    let html = shown.map(rowHtml).join('');
+    if (rows.length > shown.length) {
+      const next = Math.min(PAGE_SIZE, rows.length - shown.length);
+      html += `<li class="p-3 text-center"><button type="button" id="more" class="btn">Show ${fmt.format(next)} more <span class="text-zinc-400">(${fmt.format(rows.length - shown.length)} left)</span></button></li>`;
+    }
+    list.innerHTML = html;
+
     list.querySelectorAll('li[data-name]').forEach((li, i) => {
-      const f = rows[i];
+      const f = shown[i];
       const p = li.querySelector('.preview');
       p.style.fontFamily = `"${f.name.replace(/["\\]/g, '\\$&')}", system-ui, sans-serif`;
       p.style.fontWeight = f.preview.weight;
       p.style.fontStyle = f.preview.italic ? 'italic' : 'normal';
-      observer.observe(li);
+      if (state.view === 'previews') observer.observe(li);
     });
-    renderStatus();
+  }
+
+  function coverageTone(p) {
+    if (p === 100) return { text: 'text-emerald-700 dark:text-emerald-400', bar: 'bg-emerald-500' };
+    if (p >= 80) return { text: 'text-zinc-800 dark:text-zinc-200', bar: 'bg-indigo-500' };
+    if (p >= 50) return { text: 'text-amber-700 dark:text-amber-300', bar: 'bg-amber-500' };
+    return { text: 'text-rose-700 dark:text-rose-300', bar: 'bg-rose-500' };
   }
 
   function rowHtml(f) {
-    const chips = f.missing.map((k) =>
-      `<span class="chip bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300" title="${esc(MISSING_HINTS[k])}">${esc(MISSING_LABELS[k])}</span>`).join('');
+    const tone = coverageTone(f.coverage);
+    const sep = '<span class="text-zinc-300 dark:text-zinc-700" aria-hidden="true">·</span>';
+    const warn = 'text-amber-700 dark:text-amber-300';
+    let summary;
+    if (f.tagged) {
+      const p = f.parts;
+      const classes = p.classification.length
+        ? `<span class="code">${esc(p.classification.slice(0, 2).map(trimSlash).join(', '))}${p.classification.length > 2 ? ` +${p.classification.length - 2}` : ''}</span>`
+        : `<span class="${p.special ? '' : warn}">no classification</span>`;
+      summary = [
+        `<span>Expressive <b class="font-semibold tabular-nums ${!p.special && p.eCount <= THIN_EXPRESSIVE ? warn : 'text-zinc-700 dark:text-zinc-300'}">${p.eCount}</b></span>`,
+        `<span>Quality <b class="font-semibold tabular-nums ${p.qMissing.length ? warn : 'text-zinc-700 dark:text-zinc-300'}">${p.qHave}/${p.qTotal}</b></span>`,
+        classes,
+      ].join(sep);
+    } else {
+      summary = '<span>No tags yet</span>';
+    }
+    const issues = f.issues
+      .filter((i) => !(i.key === 'untagged' && state.scope === 'untagged'))
+      .map((i) => `<span class="chip ${i.key === 'untagged' ? 'chip-bad' : 'chip-warn'}" title="${esc(i.why)}">${esc(i.label)}</span>`).join('');
     const nonLatin = f.latin ? '' :
-      `<span class="chip bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400" title="This family has no Latin subset, so the preview falls back to a system font">No Latin glyphs</span>`;
+      `<span class="chip chip-muted" title="This family has no Latin subset, so the preview falls back to a system font">No Latin glyphs</span>`;
+
     return `
-      <li data-name="${esc(f.name)}" data-q="${esc(f.preview.q)}" class="grid items-center gap-x-4 gap-y-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-5">
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span class="font-medium">${esc(f.name)}</span>
-            <span class="chip bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">${esc(f.category || 'Uncategorized')}</span>
-            ${f.added ? `<span class="text-xs text-zinc-400 dark:text-zinc-500">Added ${esc(f.added)}</span>` : ''}
+      <li data-name="${esc(f.name)}" data-q="${esc(f.preview.q)}" class="px-4 py-3 sm:px-5">
+        <div class="grid items-center gap-x-5 gap-y-2 sm:grid-cols-[minmax(0,1fr)_6rem_auto]">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span class="font-medium">${esc(f.name)}</span>
+              <span class="chip chip-muted">${esc(f.category || 'Uncategorized')}</span>
+              ${f.added ? `<span class="text-xs text-zinc-400 dark:text-zinc-500">Added ${esc(f.added)}</span>` : ''}
+            </div>
+            <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">${summary}${issues || nonLatin ? `<span class="flex flex-wrap gap-1">${issues}${nonLatin}</span>` : ''}</div>
+            <div class="preview mt-1 text-zinc-800 dark:text-zinc-200">${esc(state.sample || f.name)}</div>
           </div>
-          ${chips || nonLatin ? `<div class="mt-1.5 flex flex-wrap gap-1">${chips}${nonLatin}</div>` : ''}
-          <div class="preview mt-1.5 text-zinc-800 dark:text-zinc-200">${esc(state.sample || f.name)}</div>
+          <div class="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1" title="Tagging coverage">
+            <span class="w-10 text-sm font-semibold tabular-nums sm:w-auto ${tone.text}">${f.coverage}%</span>
+            <span class="block h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"><span class="block h-full rounded-full ${tone.bar}" style="width:${f.coverage}%"></span></span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 sm:justify-end">
+            ${f.tagged ? `<button type="button" class="row-action" data-expand aria-expanded="false">Tags <span class="tabular-nums text-zinc-400">${f.tags.length}</span><svg class="h-3 w-3 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>` : ''}
+            <button type="button" class="row-action" data-copy="${esc(f.name)}">Copy</button>
+            <a class="row-action" href="${esc(specimenUrl(f.name))}" target="_blank" rel="noopener">Specimen <span aria-hidden="true">↗</span></a>
+            <a class="row-action" href="${TAGGER_URL}" target="_blank" rel="noopener" data-copy="${esc(f.name)}" data-tagger title="Copies the family name and opens the GF Tagger. Paste it into a “Tags in font” panel.">Tagger <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-1.5">
-          <button type="button" class="row-action" data-copy="${esc(f.name)}">Copy name</button>
-          <a class="row-action" href="${esc(specimenUrl(f.name))}" target="_blank" rel="noopener">Specimen <span aria-hidden="true">↗</span></a>
-          <a class="row-action" href="${TAGGER_URL}" target="_blank" rel="noopener" data-copy="${esc(f.name)}" data-tagger title="Copies the family name and opens the GF Tagger. Paste it into a “Tags in font” panel.">Tagger <span aria-hidden="true">↗</span></a>
-        </div>
+        <div class="tag-panel hidden"></div>
       </li>`;
   }
 
-  function renderCategoryOptions() {
-    const sel = $('#category');
-    const pool = state.model ? state.model[state.scope] : [];
-    const counts = Object.fromEntries(CATEGORIES.map((c) => [c, 0]));
-    pool.forEach((f) => { if (f.category in counts) counts[f.category]++; });
-    sel.innerHTML = [`<option value="">All categories${state.model ? ` (${pool.length})` : ''}</option>`]
-      .concat(CATEGORIES.map((c) => `<option value="${esc(c)}">${esc(c)}${state.model ? ` (${counts[c]})` : ''}</option>`))
-      .join('');
-    sel.value = state.category;
+  // Built on demand when a row's Tags panel is opened.
+  function tagPanelHtml(f) {
+    const m = state.model, p = f.parts, s = m.stats;
+    const scoreValue = (t) => Math.max(...String(t.score).split('–').map(Number).filter((x) => !Number.isNaN(x)), -1);
+    const chip = (t, label) => `<button type="button" class="tag-chip" data-tag="${esc(t.path)}" title="List families tagged ${esc(t.path)}${t.vf ? '. Variable font: scored at several axis positions' : ''}">${esc(label)}${t.score !== '' ? ` <span class="tabular-nums text-zinc-400">${esc(t.score)}</span>` : ''}${t.vf ? ' <span class="text-[9px] font-semibold uppercase tracking-wide text-zinc-400">vf</span>' : ''}</button>`;
+    const missingChip = (path, label, cls) => `<button type="button" class="tag-chip ${cls}" data-tag="!${esc(path)}" title="List families without ${esc(path)}. ${pct(s.share(path))} of tagged families have it.">${esc(label)} <span class="tabular-nums opacity-70">${pct(s.share(path))}</span></button>`;
+    const section = (title, meta, body) => `
+      <div>
+        <div class="flex flex-wrap items-baseline gap-x-2"><span class="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">${title}</span><span class="text-zinc-500 dark:text-zinc-400">${meta}</span></div>
+        <div class="mt-1.5 flex flex-wrap gap-1">${body}</div>
+      </div>`;
+    const inGroup = (g) => f.tags.filter((t) => t.group === g);
+
+    const issues = f.issues.length ? `
+      <ul class="space-y-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+        ${f.issues.map((i) => `<li><span class="font-semibold">${esc(i.label)}.</span> ${esc(i.why)}</li>`).join('')}
+      </ul>` : '';
+
+    const expressive = inGroup('Expressive').sort((a, b) => scoreValue(b) - scoreValue(a));
+    const expressiveBody = expressive.map((t) => chip(t, leaf(t.path))).join('') +
+      (p.notScored.length ? `<span class="mx-1 self-center text-zinc-400">Not scored:</span>${p.notScored.map((path) => missingChip(path, leaf(path), 'tag-chip-missing')).join('')}` : '');
+
+    const quality = inGroup('Quality').sort((a, b) => a.path.localeCompare(b.path));
+    const qualityBody = quality.map((t) => chip(t, leaf(t.path))).join('') +
+      p.qMissing.map((path) => missingChip(path, leaf(path) + ' missing', 'tag-chip-warn')).join('');
+
+    const classification = f.tags.filter((t) => CLASSIFICATION_GROUPS.includes(t.group)).sort((a, b) => a.path.localeCompare(b.path));
+    const classificationBody = classification.length
+      ? classification.map((t) => chip(t, trimSlash(t.path))).join('')
+      : `<span class="text-amber-700 dark:text-amber-300">None yet</span>`;
+    const expectedText = p.expected === ANY_CLASSIFICATION
+      ? 'any classification tag expected'
+      : `${esc(f.category)} → ${esc(p.expected.label)} expected`;
+
+    const known = new Set(['Expressive', 'Quality', ...CLASSIFICATION_GROUPS]);
+    const other = f.tags.filter((t) => !known.has(t.group)).sort((a, b) => a.path.localeCompare(b.path));
+
+    return `
+      <div class="mt-3 space-y-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs dark:border-zinc-800 dark:bg-zinc-950/60">
+        ${issues}
+        ${section('Expressive', `${p.eCount} of ${s.expressiveTotal} scored${p.special ? ' · special use, not required' : ` · ${s.expressiveTarget} counts as full`}`, expressiveBody || '<span class="text-zinc-400">None</span>')}
+        ${section('Quality', `${p.qHave} of ${p.qTotal}`, qualityBody || '<span class="text-zinc-400">None</span>')}
+        ${section('Classification', p.special ? 'special use' : expectedText, classificationBody)}
+        ${other.length ? section('Other', '', other.map((t) => chip(t, trimSlash(t.path))).join('')) : ''}
+      </div>`;
   }
 
   function renderStatus() {
@@ -654,14 +1011,23 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  const csvCell = (v) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const csvCell = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const statusOf = (f) => (!f.tagged ? 'untagged' : f.coverage === 100 ? 'fully tagged' : 'partly tagged');
 
   function exportRecord(f) {
+    const p = f.parts;
     return {
       family: f.name,
       category: f.category,
-      status: f.missing.length ? 'partly tagged' : 'untagged',
-      missing: f.missing.map((k) => MISSING_LABELS[k]),
+      coveragePct: f.coverage,
+      status: statusOf(f),
+      gaps: f.issues.map((i) => ({ type: i.key, label: i.label, detail: i.why })),
+      missingQualityTags: p ? p.qMissing : [],
+      expressiveScored: p ? p.eCount : 0,
+      qualityScored: p ? `${p.qHave}/${p.qTotal}` : '',
+      classificationTags: p ? p.classification : [],
+      expressiveNotScored: p ? p.notScored : [],
+      tags: Object.fromEntries(f.tags.map((t) => [t.path, t.vf ? { score: t.score, variable: true } : t.score])),
       dateAdded: f.added,
       specimenUrl: specimenUrl(f.name),
     };
@@ -671,26 +1037,29 @@
     const rows = currentRows();
     if (!rows.length) return;
     const stamp = new Date().toISOString().slice(0, 10);
-    const base = `google-fonts-${state.scope === 'untagged' ? 'untagged' : 'partly-tagged'}-${stamp}`;
+    const base = `untagger-${state.scope === 'all' ? 'all-families' : state.scope === 'partial' ? 'partly-tagged' : 'untagged'}-${stamp}`;
     const names = rows.map((f) => f.name).join('\n') + '\n';
 
     if (kind === 'copy') {
-      toast((await copyText(names)) ? `Copied ${rows.length} ${rows.length === 1 ? 'name' : 'names'}` : 'Copy failed');
+      toast((await copyText(names)) ? `Copied ${fmt.format(rows.length)} ${rows.length === 1 ? 'name' : 'names'}` : 'Copy failed');
     } else if (kind === 'txt') {
       download(base + '.txt', 'text/plain;charset=utf-8', names);
     } else if (kind === 'csv') {
-      const header = 'family,category,status,missing,date_added,specimen_url';
-      const lines = rows.map(exportRecord).map((r) =>
-        [r.family, r.category, r.status, r.missing.join('; '), r.dateAdded, r.specimenUrl].map(csvCell).join(','));
-      download(base + '.csv', 'text/csv;charset=utf-8', [header, ...lines].join('\n') + '\n');
+      const header = ['family', 'category', 'coverage_pct', 'status', 'gaps', 'missing_quality_tags', 'expressive_scored', 'quality_scored', 'classification_tags', 'tag_count', 'date_added', 'specimen_url'];
+      const lines = rows.map((f) => {
+        const r = exportRecord(f);
+        return [r.family, r.category, r.coveragePct, r.status, r.gaps.map((g) => g.label).join('; '), r.missingQualityTags.join('; '),
+          r.expressiveScored, r.qualityScored, r.classificationTags.join('; '), f.tags.length, r.dateAdded, r.specimenUrl].map(csvCell).join(',');
+      });
+      download(base + '.csv', 'text/csv;charset=utf-8', [header.join(','), ...lines].join('\n') + '\n');
     } else if (kind === 'json') {
+      const t = state.model.totals;
       const payload = {
         generatedAt: new Date().toISOString(),
         dataFetchedAt: state.meta ? new Date(state.meta.fetchedAt).toISOString() : null,
         sources: { catalog: META_URL, tags: CSV_URL },
-        scope: state.scope,
-        filters: { search: state.query || null, category: state.category || null },
-        totals: { catalog: state.model.total, tagged: state.model.tagged, untagged: state.model.untagged.length, partlyTagged: state.model.partial.length },
+        view: { show: state.scope, search: state.query || null, category: state.category || null, gaps: state.issue || null, coverage: state.coverage || null, sort: state.sort },
+        totals: { catalog: t.catalog, tagged: t.tagged, fullyTagged: t.full, partlyTagged: t.partial, untagged: t.untagged },
         count: rows.length,
         families: rows.map(exportRecord),
       };
@@ -715,6 +1084,11 @@
   // ---------------------------------------------------------------------------
   // Events
   // ---------------------------------------------------------------------------
+  function update(changes) {
+    Object.assign(state, changes, { limit: PAGE_SIZE });
+    render();
+  }
+
   $('#refresh').addEventListener('click', async () => {
     if (cooldownLeft() > 0 || state.loading) return;
     store.set(COOLDOWN_KEY, String(Date.now()));
@@ -728,12 +1102,21 @@
     store.set('gfu:theme', dark ? 'dark' : 'light');
   });
 
-  document.querySelectorAll('.scope-btn').forEach((btn) =>
-    btn.addEventListener('click', () => { state.scope = btn.dataset.scope; render(); }));
+  document.querySelectorAll('[data-scope]').forEach((btn) =>
+    btn.addEventListener('click', () => update({ scope: btn.dataset.scope })));
+  document.querySelectorAll('button[data-view]').forEach((btn) =>
+    btn.addEventListener('click', () => update({ view: btn.dataset.view })));
 
-  $('#search').addEventListener('input', (e) => { state.query = e.target.value; render(); });
-  $('#category').addEventListener('change', (e) => { state.category = e.target.value; render(); });
-  $('#sort').addEventListener('change', (e) => { state.sort = e.target.value; render(); });
+  let searchTimer;
+  $('#search').addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => update({ query: e.target.value }), 120);
+  });
+  $('#category').addEventListener('change', (e) => update({ category: e.target.value }));
+  $('#issue').addEventListener('change', (e) => update({ issue: e.target.value }));
+  $('#coverage').addEventListener('change', (e) => update({ coverage: e.target.value }));
+  $('#sort').addEventListener('change', (e) => update({ sort: e.target.value }));
+  $('#reset').addEventListener('click', () => update({ query: '', category: '', issue: '', coverage: '' }));
   $('#sample').addEventListener('input', (e) => {
     state.sample = e.target.value;
     document.querySelectorAll('#list .preview').forEach((p) => {
@@ -745,6 +1128,32 @@
     btn.addEventListener('click', () => doExport(btn.dataset.export)));
 
   $('#list').addEventListener('click', (e) => {
+    const more = e.target.closest('#more');
+    if (more) {
+      state.limit += PAGE_SIZE;
+      renderList();
+      return;
+    }
+
+    const expand = e.target.closest('[data-expand]');
+    if (expand) {
+      const li = expand.closest('li');
+      const panel = li.querySelector('.tag-panel');
+      if (!panel.innerHTML) panel.innerHTML = tagPanelHtml(state.model.byName.get(li.dataset.name));
+      const open = panel.classList.toggle('hidden') === false;
+      expand.setAttribute('aria-expanded', String(open));
+      expand.querySelector('svg').classList.toggle('rotate-180', open);
+      return;
+    }
+
+    const tag = e.target.closest('[data-tag]');
+    if (tag) {
+      update({ query: tag.dataset.tag, scope: 'all', issue: '', coverage: '' });
+      $('#list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      toast(tag.dataset.tag.startsWith('!') ? `Families without ${tag.dataset.tag.slice(1)}` : `Families tagged ${tag.dataset.tag}`);
+      return;
+    }
+
     const btn = e.target.closest('[data-copy]');
     if (!btn) return;
     const name = btn.dataset.copy;
@@ -768,10 +1177,14 @@
     }
   });
 
+  window.addEventListener('hashchange', () => { readUrl(); state.limit = PAGE_SIZE; render(); });
+
   // Keep the "fetched N min ago" line current.
   setInterval(renderStatus, 60 * 1000);
 
+  readUrl();
   tickCooldown();
+  render();
   load();
 })();
 </script>
