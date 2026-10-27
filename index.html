@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Untagger · Google Fonts tag coverage</title>
-<meta name="description" content="Tag coverage for every Google Fonts family: what's untagged, what's partly tagged, and which tags are missing." />
+<meta name="description" content="Tag coverage for every Google Fonts family: what's untagged, what's partly tagged, which tags are missing, tagging proposals and severity reports." />
 <script>
   // Apply the saved/system theme before first paint to avoid a flash.
   (function () {
@@ -41,10 +41,16 @@
   select { background-image: none; }
   details > summary { list-style: none; }
   details > summary::-webkit-details-marker { display: none; }
+  @media print {
+    #app-main, #doc-toolbar, #toast { display: none !important; }
+    body { background: #fff !important; }
+    #doc-wrap { padding: 0 !important; max-width: none !important; }
+  }
 </style>
 <style type="text/tailwindcss">
   @layer components {
   .btn { @apply inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800; }
+  .btn-primary { @apply border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 dark:border-indigo-500 dark:bg-indigo-500 dark:text-white dark:hover:bg-indigo-400; }
   .field { @apply h-10 w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none ring-indigo-500/40 placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-indigo-500; }
   .export-btn { @apply h-8 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800; }
   .seg { @apply inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 text-sm dark:border-zinc-800 dark:bg-zinc-900; }
@@ -65,7 +71,7 @@
 </style>
 </head>
 <body data-view="compact" class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
-<div class="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+<div id="app-main" class="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
 
   <!-- Header -->
   <header class="flex flex-wrap items-start justify-between gap-4">
@@ -76,7 +82,8 @@
         <a class="underline decoration-zinc-300 underline-offset-2 hover:text-zinc-900 dark:decoration-zinc-700 dark:hover:text-zinc-100" href="https://github.com/google/fonts/blob/main/tags/all/families.csv" target="_blank" rel="noopener">google/fonts · tags/all/families.csv</a>.
       </p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <button id="open-report" type="button" class="btn btn-primary" title="A printable report of where tagging is lacking, most severe first">Severity report</button>
       <a class="btn" href="https://googlefonts.github.io/tagger/" target="_blank" rel="noopener">Open tagger <span aria-hidden="true">↗</span></a>
       <button id="refresh" type="button" class="btn">
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
@@ -135,6 +142,7 @@
           <select id="sort" class="h-8 rounded-lg border border-zinc-200 bg-white px-2 text-sm text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
             <option value="least">Least tagged</option>
             <option value="most">Most tagged</option>
+            <option value="severity">Most severe gaps</option>
             <option value="newest">Newest added</option>
             <option value="name">A–Z</option>
             <option value="popular">Most popular</option>
@@ -163,7 +171,7 @@
 
     <details id="legend" class="group rounded-xl border border-zinc-200 bg-white text-sm dark:border-zinc-800 dark:bg-zinc-900">
       <summary class="flex cursor-pointer select-none items-center justify-between gap-2 px-4 py-2.5 text-zinc-600 dark:text-zinc-300">
-        <span>How the percentages work</span>
+        <span>How the percentages, gaps and proposals work</span>
         <svg class="h-4 w-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
       </summary>
       <div id="legend-body" class="space-y-2 border-t border-zinc-200 px-4 py-3 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400"></div>
@@ -175,6 +183,7 @@
         <button id="reset" type="button" class="hidden text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">Clear filters</button>
       </div>
       <div class="flex flex-wrap gap-1.5" aria-label="Export">
+        <button id="propose-list" type="button" class="export-btn" title="Tagging proposals for the families listed, in the order shown (up to 25)">Propose tags</button>
         <button data-export="copy" class="export-btn">Copy names</button>
         <button data-export="txt" class="export-btn">.txt</button>
         <button data-export="csv" class="export-btn">.csv</button>
@@ -189,8 +198,26 @@
   <footer id="status" class="mt-6 text-xs leading-relaxed text-zinc-500 dark:text-zinc-500"></footer>
 </div>
 
+<!-- Documents (proposals and the severity report) -->
+<div id="doc-view" class="hidden">
+  <div id="doc-toolbar" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-3">
+      <button id="doc-back" type="button" class="btn">← Back to list</button>
+      <span id="doc-title" class="min-w-0 truncate text-sm text-zinc-500 dark:text-zinc-400"></span>
+      <div class="ml-auto flex flex-wrap gap-2">
+        <button id="doc-copy" type="button" class="btn hidden" title="Copy the proposed families.csv rows">Copy CSV rows</button>
+        <button id="doc-download" type="button" class="btn">Download HTML</button>
+        <button id="doc-print" type="button" class="btn btn-primary">Print / PDF</button>
+      </div>
+    </div>
+  </div>
+  <div id="doc-wrap" class="mx-auto max-w-5xl px-2 py-6 sm:px-4">
+    <article id="doc" class="doc"></article>
+  </div>
+</div>
+
 <div id="toast" role="status" aria-live="polite"
-  class="pointer-events-none fixed bottom-6 left-1/2 z-10 -translate-x-1/2 translate-y-2 rounded-lg bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white opacity-0 shadow-lg transition dark:bg-zinc-100 dark:text-zinc-900"></div>
+  class="pointer-events-none fixed bottom-6 left-1/2 z-20 -translate-x-1/2 translate-y-2 rounded-lg bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white opacity-0 shadow-lg transition dark:bg-zinc-100 dark:text-zinc-900"></div>
 
 <input id="file-input" type="file" accept=".json,.csv,.txt,application/json,text/csv" multiple class="hidden" />
 
@@ -233,16 +260,28 @@
     { label: 'googlefonts/tagger on GitHub', url: 'https://raw.githubusercontent.com/googlefonts/tagger/main/public/tag_definitions.json' },
   ];
 
-  const CACHE_KEY = 'gfu:data:v4';
+  const CACHE_KEY = 'gfu:data:v5';
   const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
   const COOLDOWN_KEY = 'gfu:lastRefresh';
-  const COOLDOWN_MS = 30 * 1000;
+  const COOLDOWN_MS = 5 * 1000;         // only stops accidental double clicks; the sources aren't rate limited
   const FETCH_TIMEOUT_MS = 15 * 1000;
   const PAGE_SIZE = 100;
 
   // Expected-measure rules (see the "How the percentages work" panel).
   const THIN_EXPRESSIVE = 3;            // this many Expressive tags or fewer is flagged
   const EXPECTED_TAG_SHARE = 0.9;       // a Quality tag is expected if 90%+ of tagged families have it
+
+  // Proposals: nearest tagged families by metadata similarity (see similarity()).
+  const K_NEIGHBOURS = 10;
+  const MAX_SIMILARITY = 15;
+  // Words dropped to find a family's superfamily ("Asap Sharp" → "asap", "Libre Caslon Text" → "libre caslon").
+  const STYLE_WORDS = new Set(['condensed', 'semicondensed', 'expanded', 'semiexpanded', 'extended', 'narrow', 'wide', 'compressed',
+    'text', 'display', 'caption', 'headline', 'subhead', 'micro', 'sc', 'caps', 'smallcaps', 'unicase', 'one', 'two', 'sharp', 'round',
+    'rounded', 'inline', 'outline', 'shadow', 'stencil', 'italic', 'new', 'pro', 'std', 'hairline', 'light', 'thin', 'black', 'heavy',
+    'bold', 'extra', 'ultra', 'poster', 'titling', 'swash', 'alt', 'alternate', 'variable', 'vf', 'mono', 'fill']);
+  const MAX_PROPOSAL_FAMILIES = 25;
+  const WEIGHT_POWER = 3;               // vote weight = similarity³, so the closest relatives dominate
+  const CALIBRATION_SAMPLE = 150;
 
   const CATEGORIES = ['Sans Serif', 'Serif', 'Display', 'Handwriting', 'Monospace'];
   const CLASSIFICATION_GROUPS = ['Sans', 'Serif', 'Slab', 'Script', 'Theme', 'Monospace', 'Special use', 'Not text'];
@@ -254,6 +293,13 @@
     'Monospace': { groups: ['Monospace'], label: '/Monospace' },
   };
   const expectedFor = (category) => EXPECTED_CLASSIFICATION[category] || ANY_CLASSIFICATION;
+
+  const SEVERITY = {
+    4: { key: 'critical', label: 'Critical' },
+    3: { key: 'high', label: 'High' },
+    2: { key: 'medium', label: 'Medium' },
+    1: { key: 'low', label: 'Low' },
+  };
 
   const SCOPES = {
     all: { noun: 'families', test: () => true },
@@ -294,10 +340,15 @@
   const fmt = new Intl.NumberFormat();
   const pct = (x) => (x >= 0.995 && x < 1 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
   const taggerPct = (p) => (p === 0 ? '0%' : p.toFixed(1) + '%');
+  const sharePct = (x) => (x > 0 && x < 0.1 ? (x * 100).toFixed(1) + '%' : pct(x));
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const groupOf = (path) => path.split('/')[1] || '';
   const leaf = (path) => path.split('/').pop();
   const trimSlash = (path) => path.replace(/^\//, '');
+  const plural = (n, one, many = one + 's') => `${fmt.format(n)} ${n === 1 ? one : many}`;
+  const listText = (items) => (items.length <= 1 ? items.join('') : items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1]);
+  const popularityOf = (f) => (typeof f.popularity === 'number' ? f.popularity : Infinity);
+  const byPopularity = (a, b) => popularityOf(a) - popularityOf(b) || a.name.localeCompare(b.name);
 
   const store = {
     get(key) { try { return localStorage.getItem(key); } catch (e) { return null; } },
@@ -305,6 +356,7 @@
   };
 
   const specimenUrl = (name) => 'https://fonts.google.com/specimen/' + encodeURIComponent(name).replace(/%20/g, '+');
+  const appUrl = (hash) => location.origin + location.pathname + location.search + (hash ? '#' + hash : '');
 
   function relativeTime(ts) {
     const s = Math.round((Date.now() - ts) / 1000);
@@ -357,12 +409,13 @@
   async function fetchTaggerTags(fresh) {
     const [list, defs] = await Promise.allSettled([
       firstWorking(TAGGER_LIST_SOURCES, parseTaggerList, fresh),
-      firstWorking(TAGGER_DEFS_SOURCES, (text) => Object.keys(JSON.parse(text)), fresh),
+      firstWorking(TAGGER_DEFS_SOURCES, parseTaggerDefinitions, fresh),
     ]);
     if (list.status !== 'fulfilled') return null;
     const names = new Set(list.value.data);
-    if (defs.status === 'fulfilled') defs.value.data.forEach((n) => names.add(n));
-    return { names: [...names].sort(), source: list.value.source };
+    const descriptions = defs.status === 'fulfilled' ? defs.value.data : {};
+    Object.keys(descriptions).forEach((n) => names.add(n));
+    return { names: [...names].sort(), descriptions, source: list.value.source };
   }
 
   // ---------------------------------------------------------------------------
@@ -380,6 +433,12 @@
       popularity: typeof f.popularity === 'number' ? f.popularity : null,
       latin: Array.isArray(f.subsets) ? f.subsets.includes('latin') : true,
       preview: previewSpec(f.family, Object.keys(f.fonts || {})),
+      // Used to find similar families for proposals.
+      designers: Array.isArray(f.designers) ? f.designers : [],
+      stroke: f.stroke || '',
+      classifications: Array.isArray(f.classifications) ? f.classifications : [],
+      script: f.primaryScript || '',
+      axes: Array.isArray(f.axes) ? f.axes.map((a) => a.tag) : [],
     }));
   }
 
@@ -419,8 +478,8 @@
     return rows;
   }
 
-  // Compact, cacheable form: { vocab: [tagPath], fam: { lowercased family: [[vocabIndex, score, isVariable, taggerCount]] } }.
-  // Variable-font tags have one row per axis position; they collapse to a "min–max" score.
+  // Compact, cacheable form: { vocab: [tagPath], fam: { lowercased family: [[vocabIndex, score, isVariable, taggerCount, mean]] } }.
+  // Variable-font tags have one row per axis position; they collapse to a "min–max" score and a mean.
   // taggerCount mirrors the GF Tagger: each static row is one tagging, and all of a tag's
   // variable rows ("…@…" axis positions) together are one.
   function parseTags(text) {
@@ -447,7 +506,8 @@
       fam[key] = [...tags].map(([path, t]) => {
         const lo = Math.min(...t.scores), hi = Math.max(...t.scores);
         const score = !t.scores.length ? '' : lo === hi ? String(lo) : `${lo}–${hi}`;
-        return [vocabIndex.get(path), score, t.vf ? 1 : 0, t.staticRows + (t.vf ? 1 : 0)];
+        const mean = t.scores.length ? Math.round((t.scores.reduce((a, b) => a + b, 0) / t.scores.length) * 10) / 10 : null;
+        return [vocabIndex.get(path), score, t.vf ? 1 : 0, t.staticRows + (t.vf ? 1 : 0), mean];
       });
     }
     return { vocab: [...vocabIndex.keys()], fam };
@@ -459,14 +519,23 @@
     return names;
   }
 
+  // Keep each tag's one-line description, where the tagger has one.
+  function parseTaggerDefinitions(text) {
+    const defs = JSON.parse(text);
+    if (!defs || typeof defs !== 'object') throw new Error('unexpected definitions format');
+    const out = {};
+    for (const [name, d] of Object.entries(defs)) out[name] = (d && d.superShortDescription) || '';
+    return out;
+  }
+
   // ---------------------------------------------------------------------------
-  // Model: both measures, flagged gaps, and the stats behind them
+  // Model: both measures, flagged gaps, severity and the stats behind them
   // ---------------------------------------------------------------------------
   function buildModel(catalog, tagData, taggerTags) {
     const { vocab, fam } = tagData;
     const families = catalog.map((c) => {
-      const tags = (fam[c.name.toLowerCase()] || []).map(([i, score, vf, n]) =>
-        ({ path: vocab[i], group: groupOf(vocab[i]), score, vf: !!vf, n: n ?? 1 }));
+      const tags = (fam[c.name.toLowerCase()] || []).map(([i, score, vf, n, mean]) =>
+        ({ path: vocab[i], group: groupOf(vocab[i]), score, vf: !!vf, n: n ?? 1, avg: mean ?? (parseFloat(score) || null) }));
       return { ...c, nameLower: c.name.toLowerCase(), tagged: tags.length > 0, tags, tagPathsLower: tags.map((t) => t.path.toLowerCase()) };
     });
     const tagged = families.filter((f) => f.tagged);
@@ -500,6 +569,8 @@
 
     const stats = {
       share,
+      vocab,
+      descriptions: (taggerTags && taggerTags.descriptions) || {},
       taggedCount: tagged.length,
       tagger: {
         total: taggerTotal,
@@ -582,6 +653,16 @@
       }
     }
 
+    // Severity: how sure we are that tags are missing, most certain first.
+    for (const f of families) {
+      const strongClassification = hasIssue(f, 'classification') && f.parts.expected !== ANY_CLASSIFICATION;
+      if (!f.tagged) f.severity = 4;
+      else if (hasIssue(f, 'quality') || strongClassification) f.severity = 3;
+      else if (f.issues.length) f.severity = 2;
+      else if (f.tagger < stats.tagger.p10) f.severity = 1;
+      else f.severity = 0;
+    }
+
     return {
       families,
       byName: new Map(families.map((f) => [f.name, f])),
@@ -600,10 +681,222 @@
   }
 
   // ---------------------------------------------------------------------------
-  // State (mirrored into the URL hash so filtered views can be shared)
+  // Similar families and tag proposals
   // ---------------------------------------------------------------------------
-  const DEFAULTS = { scope: 'all', measure: 'tagger', query: '', category: '', issue: '', tpct: '', epct: '', sort: 'least', view: 'compact' };
-  const URL_KEYS = { scope: 'show', measure: 'measure', query: 'q', category: 'cat', issue: 'gap', tpct: 'tagger', epct: 'expected', sort: 'sort', view: 'layout' };
+  // Similarity uses the catalog metadata, which every family has (the tagger's style embeddings
+  // don't cover new families): shared name words weighted by rarity, shared designers, category,
+  // stroke, classifications, script and axes. Tested against families with known tags, the 10
+  // nearest predict Expressive scores better than any per-tag or per-category average.
+  function similarityIndex() {
+    const m = state.model;
+    if (m.simIndex) return m.simIndex;
+    const tokens = (name) => [...new Set(name.toLowerCase().match(/[a-z0-9]+/g) || [])];
+    const df = new Map();
+    m.families.forEach((f) => tokens(f.name).forEach((t) => df.set(t, (df.get(t) || 0) + 1)));
+    const N = m.families.length;
+    const feats = new Map();
+    for (const f of m.families) {
+      const words = new Map(tokens(f.name).map((t) => [t, Math.log(N / df.get(t))]));
+      const core = (f.name.toLowerCase().match(/[a-z0-9]+/g) || []).filter((w) => !STYLE_WORDS.has(w));
+      feats.set(f, {
+        words,
+        stem: core.join(' '),
+        wordSum: [...words.values()].reduce((a, b) => a + b, 0),
+        designers: new Set(f.designers || []),
+        classifications: new Set(f.classifications || []),
+        axes: new Set(f.axes || []),
+      });
+    }
+    // Per-tag values across tagged families, for references, fallbacks and calibration.
+    const tagValues = new Map();
+    for (const f of m.families) for (const t of f.tags) {
+      if (t.avg == null) continue;
+      if (!tagValues.has(t.path)) tagValues.set(t.path, []);
+      tagValues.get(t.path).push({ f, v: t.avg });
+    }
+    const tagMean = new Map([...tagValues].map(([p, list]) => [p, list.reduce((a, o) => a + o.v, 0) / list.length]));
+    m.simIndex = { feats, pool: m.families.filter((f) => f.tagged), tagValues, tagMean };
+    return m.simIndex;
+  }
+
+  const jaccard = (a, b) => {
+    if (!a.size && !b.size) return 1;
+    let inter = 0;
+    for (const x of a) if (b.has(x)) inter++;
+    return inter / (a.size + b.size - inter);
+  };
+
+  function nameSimilarity(A, B) {
+    let inter = 0;
+    for (const [t, w] of A.words) if (B.words.has(t)) inter += w;
+    const union = A.wordSum + B.wordSum - inter;
+    return union ? inter / union : 0;
+  }
+
+  function similarity(a, b, idx) {
+    const A = idx.feats.get(a), B = idx.feats.get(b);
+    let s = 4 * nameSimilarity(A, B);
+    if (A.stem && A.stem === B.stem) s += 3;
+    for (const d of A.designers) if (B.designers.has(d)) { s += 3; break; }
+    if (a.category === b.category) s += 2;
+    if (a.stroke && a.stroke === b.stroke) s += 1;
+    s += jaccard(A.classifications, B.classifications);
+    if (a.script && a.script === b.script) s += 0.5;
+    if (A.axes.size && B.axes.size) s += 0.5 * jaccard(A.axes, B.axes);
+    return s;
+  }
+
+  function similarityReasons(a, b) {
+    const idx = similarityIndex();
+    const A = idx.feats.get(a), B = idx.feats.get(b);
+    const out = [];
+    if (A.stem && A.stem === B.stem) out.push('same superfamily');
+    else if (nameSimilarity(A, B) >= 0.25) out.push('related name');
+    if ([...A.designers].some((d) => B.designers.has(d))) out.push('same designer');
+    if (a.category === b.category) out.push('same category');
+    if (a.script && a.script === b.script) out.push(`same script (${a.script})`);
+    if (A.axes.size && B.axes.size && jaccard(A.axes, B.axes) === 1) out.push('same axes');
+    return out;
+  }
+
+  function nearest(f, k = K_NEIGHBOURS) {
+    const idx = similarityIndex();
+    const top = [];
+    const better = (s, g, o) => s > o.s || (s === o.s && popularityOf(g) < popularityOf(o.g));
+    for (const g of idx.pool) {
+      if (g === f) continue;
+      const s = similarity(f, g, idx);
+      if (top.length < k || better(s, g, top[top.length - 1])) {
+        top.push({ g, s });
+        top.sort((x, y) => y.s - x.s || popularityOf(x.g) - popularityOf(y.g));
+        if (top.length > k) top.pop();
+      }
+    }
+    return top;
+  }
+
+  function propose(f) {
+    const s = state.model.stats;
+    const idx = similarityIndex();
+    const neighbours = nearest(f).map(({ g, s: sim }) => ({ g, sim, w: sim ** WEIGHT_POWER, why: similarityReasons(f, g) }));
+    const total = neighbours.reduce((a, nb) => a + nb.w, 0) || 1;
+    const have = new Set(f.tags.map((t) => t.path));
+    const acc = new Map();
+    for (const nb of neighbours) for (const t of nb.g.tags) {
+      if (t.avg == null) continue;
+      if (!acc.has(t.path)) acc.set(t.path, { w: 0, ws: 0, vals: [] });
+      const a = acc.get(t.path);
+      a.w += nb.w; a.ws += nb.w * t.avg; a.vals.push({ v: t.avg, w: nb.w, g: nb.g });
+    }
+    const isRelative = (w) => w === 'same superfamily' || w === 'related name' || w === 'same designer';
+    const relatives = neighbours.filter((nb) => nb.why.some(isRelative));
+
+    const make = (path) => {
+      const a = acc.get(path);
+      if (!a) {
+        const mean = idx.tagMean.get(path);
+        return mean == null ? null : { path, group: groupOf(path), score: Math.round(mean), lo: null, hi: null, spread: null, support: 0, count: 0, vals: [], fallback: true };
+      }
+      const mean = a.ws / a.w;
+      const sd = Math.sqrt(a.vals.reduce((x, o) => x + o.w * (o.v - mean) ** 2, 0) / a.w);
+      return {
+        path, group: groupOf(path), score: Math.round(mean),
+        lo: Math.max(0, Math.round(mean - sd)), hi: Math.min(100, Math.round(mean + sd)),
+        spread: sd, support: a.w / total, count: a.vals.length, vals: a.vals,
+      };
+    };
+    const confidence = (p) => {
+      let c = p.fallback ? 1 : p.support >= 0.7 && p.spread <= 15 ? 3 : p.support >= 0.5 && p.spread <= 25 ? 2 : 1;
+      if (c === 3 && !relatives.length) c = 2; // no close relatives: these are closer to category norms
+      return c;
+    };
+    const withConfidence = (p) => (p ? { ...p, confidence: confidence(p) } : null);
+    const bySupport = (a, b) => b.support - a.support || a.path.localeCompare(b.path);
+
+    const quality = s.qualityExpected.filter((p) => !have.has(p)).map(make).map(withConfidence).filter(Boolean);
+    const special = f.parts && f.parts.special;
+    const needsClassification = !special && (!f.tagged || (f.parts && !f.parts.classified));
+    const classification = needsClassification
+      ? [...acc.keys()].filter((p) => CLASSIFICATION_GROUPS.includes(groupOf(p)) && !have.has(p)).map(make).sort(bySupport).slice(0, 3)
+        .map((p) => ({ ...p, confidence: p.support >= 0.6 ? 3 : p.support >= 0.4 ? 2 : 1 }))
+      : [];
+    const others = [...acc.keys()]
+      .filter((p) => !have.has(p) && groupOf(p) !== 'Quality' && !CLASSIFICATION_GROUPS.includes(groupOf(p)))
+      .map(make);
+    const tags = others.filter((p) => p.support >= 0.5).sort(bySupport).map(withConfidence);
+    const maybe = others.filter((p) => p.support >= 0.3 && p.support < 0.5).sort(bySupport).map(withConfidence);
+    // For families that are already tagged: where they disagree most with their neighbours.
+    const disagreements = f.tags
+      .filter((t) => t.avg != null && acc.has(t.path) && acc.get(t.path).vals.length >= 3)
+      .map((t) => ({ tag: t, peer: make(t.path) }))
+      .filter((d) => Math.abs(d.tag.avg - d.peer.score) >= 30)
+      .sort((a, b) => Math.abs(b.tag.avg - b.peer.score) - Math.abs(a.tag.avg - a.peer.score));
+
+    const rows = [...quality, ...tags, ...(classification[0] ? [classification[0]] : [])];
+    return {
+      family: f, neighbours, relatives, quality, classification, tags, maybe, disagreements,
+      strength: neighbours.length ? neighbours[0].sim / MAX_SIMILARITY : 0,
+      csv: rows.map((p) => `${f.name},,${p.path},${p.score}`),
+    };
+  }
+
+  // Hide the tags of already-tagged families and predict them, to say how far to trust proposals.
+  function calibrate() {
+    const m = state.model;
+    if (m.calibration) return m.calibration;
+    const idx = similarityIndex();
+    const pool = idx.pool.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const step = Math.max(1, Math.floor(pool.length / CALIBRATION_SAMPLE));
+    const sample = pool.filter((_, i) => i % step === 0).slice(0, CALIBRATION_SAMPLE);
+    let top1 = 0, top3 = 0, classified = 0, tp = 0, fp = 0, fn = 0;
+    const eErr = [], eBase = [], qErr = [];
+    for (const f of sample) {
+      const nb = nearest(f).map((o) => ({ g: o.g, w: o.s ** WEIGHT_POWER }));
+      const total = nb.reduce((a, o) => a + o.w, 0) || 1;
+      const actual = new Map(f.tags.map((t) => [t.path, t]));
+      const acc = new Map();
+      for (const o of nb) for (const t of o.g.tags) {
+        if (t.avg == null) continue;
+        if (!acc.has(t.path)) acc.set(t.path, { w: 0, ws: 0 });
+        const a = acc.get(t.path);
+        a.w += o.w; a.ws += o.w * t.avg;
+      }
+      const cls = [...acc].filter(([p]) => CLASSIFICATION_GROUPS.includes(groupOf(p))).sort((a, b) => b[1].w - a[1].w).map(([p]) => p);
+      if ([...actual.keys()].some((p) => CLASSIFICATION_GROUPS.includes(groupOf(p)))) {
+        classified++;
+        if (cls[0] && actual.has(cls[0])) top1++;
+        if (cls.slice(0, 3).some((p) => actual.has(p))) top3++;
+      }
+      for (const p of m.expressiveVocab) {
+        const a = acc.get(p);
+        const predicted = a && a.w / total >= 0.5;
+        const present = actual.has(p);
+        if (predicted && present) tp++; else if (predicted) fp++; else if (present) fn++;
+      }
+      for (const [p, t] of actual) {
+        const a = acc.get(p);
+        if (!a || t.avg == null) continue;
+        const err = Math.abs(a.ws / a.w - t.avg);
+        if (groupOf(p) === 'Expressive') { eErr.push(err); eBase.push(Math.abs(idx.tagMean.get(p) - t.avg)); }
+        if (groupOf(p) === 'Quality') qErr.push(err);
+      }
+    }
+    const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+    m.calibration = {
+      n: sample.length,
+      top1: classified ? top1 / classified : 0,
+      top3: classified ? top3 / classified : 0,
+      expressiveError: mean(eErr), expressiveBaseline: mean(eBase), qualityError: mean(qErr),
+      precision: tp / Math.max(tp + fp, 1), recall: tp / Math.max(tp + fn, 1),
+    };
+    return m.calibration;
+  }
+
+  // ---------------------------------------------------------------------------
+  // State (mirrored into the URL hash so filtered views and documents can be shared)
+  // ---------------------------------------------------------------------------
+  const DEFAULTS = { scope: 'all', measure: 'tagger', query: '', category: '', issue: '', tpct: '', epct: '', sort: 'least', view: 'compact', doc: '', docFor: '' };
+  const URL_KEYS = { scope: 'show', measure: 'measure', query: 'q', category: 'cat', issue: 'gap', tpct: 'tagger', epct: 'expected', sort: 'sort', view: 'layout', doc: 'doc', docFor: 'for' };
   const VALID = {
     scope: (v) => v in SCOPES,
     measure: (v) => v === 'tagger' || v === 'expected',
@@ -614,6 +907,8 @@
     epct: (v) => EXPECTED_PCT_FILTERS.some((o) => o.v === v),
     sort: (v) => v in SORTERS,
     view: (v) => v === 'previews' || v === 'compact',
+    doc: (v) => v === '' || v === 'report' || v === 'proposal',
+    docFor: () => true,
   };
 
   const state = {
@@ -623,6 +918,8 @@
     model: null,
     meta: null,          // { fetchedAt, catalogSource, tagSource, fromCache }
     loading: false,
+    refreshFailed: false,
+    renderedDoc: '',
     // Partial results kept so a manual file can fill in whichever fetch failed.
     lastCatalog: null,
     lastTags: null,
@@ -637,11 +934,13 @@
     }
   }
 
-  function writeUrl() {
+  function writeUrl(push = false) {
     const params = new URLSearchParams();
     for (const [key, param] of Object.entries(URL_KEYS)) if (state[key] !== DEFAULTS[key]) params.set(param, state[key]);
     const hash = params.toString();
-    history.replaceState(null, '', hash ? '#' + hash : location.pathname + location.search);
+    const url = hash ? '#' + hash : location.pathname + location.search;
+    if (push) history.pushState({ fromApp: true }, '', url);
+    else history.replaceState(history.state, '', url);
   }
 
   // ---------------------------------------------------------------------------
@@ -670,7 +969,7 @@
     const cached = readCache();
     if (!fresh && cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
       useData(cached.catalog, cached.tags, cached.taggerTags, { ...cached, fromCache: true });
-      return;
+      return true;
     }
 
     state.loading = true;
@@ -693,7 +992,7 @@
     if (cat.status === 'fulfilled' && tags.status === 'fulfilled') {
       saveAndUse(cat.value.data, tags.value.data, tagList,
         { fetchedAt: Date.now(), catalogSource: cat.value.source, tagSource: tags.value.source });
-      return;
+      return true;
     }
 
     const failures = [];
@@ -710,6 +1009,7 @@
       render();
       showError("Couldn't load the data.", failures);
     }
+    return false;
   }
 
   // Manual fallback: user picks the files they downloaded themselves.
@@ -772,9 +1072,10 @@
   const SORTERS = {
     least: (a, b) => measureOf(a) - measureOf(b) || otherMeasureOf(a) - otherMeasureOf(b) || b.issues.length - a.issues.length || byNewest(a, b) || byName(a, b),
     most: (a, b) => measureOf(b) - measureOf(a) || otherMeasureOf(b) - otherMeasureOf(a) || byName(a, b),
+    severity: (a, b) => b.severity - a.severity || byPopularity(a, b),
     newest: (a, b) => byNewest(a, b) || byName(a, b),
     name: byName,
-    popular: (a, b) => (a.popularity ?? Infinity) - (b.popularity ?? Infinity) || byName(a, b),
+    popular: byPopularity,
   };
 
   const currentRows = () => (state.model ? filtered().sort(SORTERS[state.sort]) : []);
@@ -782,7 +1083,7 @@
   // ---------------------------------------------------------------------------
   // View
   // ---------------------------------------------------------------------------
-  function render() {
+  function render(push = false) {
     document.body.dataset.view = state.view;
     document.querySelectorAll('button[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
     document.querySelectorAll('button[data-measure]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.measure === state.measure)));
@@ -814,7 +1115,8 @@
     renderLegend();
     renderList();
     renderStatus();
-    writeUrl();
+    renderDoc();
+    writeUrl(push);
   }
 
   function renderFilterOptions() {
@@ -858,6 +1160,8 @@
       </ul>
       <p>The ${b('Measure')} switch sets which percentage is shown big and used for “Least/Most tagged” sorting; both can always be filtered. ${b('Partly tagged')} means below 100% on Expected, since on the tagger's measure every family is partly tagged.</p>
       <p>${b('Flagged gaps')} are the likely misses: a missing Quality tag, ${THIN_EXPRESSIVE} or fewer Expressive tags, or no classification tag. Families with a ${code('/Special use')} tag (barcodes, redaction, symbols) get full Expected marks for Expressive and Classification.</p>
+      <p>${b('Severity')} ranks how sure we are that tags are missing: ${b('Critical')} no tags at all; ${b('High')} a missing Quality tag, or a Sans Serif, Serif, Handwriting or Monospace family with no tag in its classification group; ${b('Medium')} ${THIN_EXPRESSIVE} or fewer Expressive tags, or a Display family with no classification tag; ${b('Low')} no flagged gaps but in the bottom 10% by tagger %. The ${b('Severity report')} lists them all, most-used families first.</p>
+      <p>${b('Proposals')} suggest tags and scores from a family's ${K_NEIGHBOURS} most similar tagged families (same superfamily, related name, same designer, category, style, script and axes; the closest count most), with diagrams that place the family among real fonts on each tag's 0–100 scale. Use ${b('Propose')} on a row, or ${b('Propose tags')} for the list shown.</p>
       <p>Open a family's ${b('Tags')} panel to see every score and the Expressive tags it hasn't been scored on. Click any tag to list the families that have it, or a dashed one to list the families that don't.</p>`;
   }
 
@@ -866,6 +1170,7 @@
     const list = $('#list');
     const rows = currentRows();
     document.querySelectorAll('.export-btn').forEach((b) => (b.disabled = !rows.length));
+    $('#propose-list').textContent = rows.length > MAX_PROPOSAL_FAMILIES ? `Propose tags (first ${MAX_PROPOSAL_FAMILIES})` : `Propose tags${rows.length ? ` (${rows.length})` : ''}`;
 
     if (state.loading && !m) {
       $('#count').textContent = 'Loading catalog and tags…';
@@ -923,6 +1228,7 @@
     low: { text: 'text-amber-700 dark:text-amber-300', bar: 'bg-amber-500' },
     bad: { text: 'text-rose-700 dark:text-rose-300', bar: 'bg-rose-500' },
   };
+  const SEVERITY_CHIP = { 4: 'chip-bad', 3: 'chip-bad', 2: 'chip-warn', 1: 'chip-muted' };
 
   // Tagger %: coloured against the catalog (bottom/top 10%), since nobody nears 100%.
   function tone(f) {
@@ -959,9 +1265,11 @@
     } else {
       summary = '<span>No tags yet</span>';
     }
+    const sev = f.severity && !(f.severity === 4 && state.scope === 'untagged')
+      ? `<span class="chip ${SEVERITY_CHIP[f.severity]}" title="Severity: see the Severity report">${SEVERITY[f.severity].label}</span>` : '';
     const issues = f.issues
-      .filter((i) => !(i.key === 'untagged' && state.scope === 'untagged'))
-      .map((i) => `<span class="chip ${i.key === 'untagged' ? 'chip-bad' : 'chip-warn'}" title="${esc(i.why)}">${esc(i.label)}</span>`).join('');
+      .filter((i) => i.key !== 'untagged')
+      .map((i) => `<span class="chip chip-warn" title="${esc(i.why)}">${esc(i.label)}</span>`).join('');
     const nonLatin = f.latin ? '' :
       `<span class="chip chip-muted" title="This family has no Latin subset, so the preview falls back to a system font">No Latin glyphs</span>`;
 
@@ -978,7 +1286,7 @@
               <span class="chip chip-muted">${esc(f.category || 'Uncategorized')}</span>
               ${f.added ? `<span class="text-xs text-zinc-400 dark:text-zinc-500">Added ${esc(f.added)}</span>` : ''}
             </div>
-            <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">${summary}${issues || nonLatin ? `<span class="flex flex-wrap gap-1">${issues}${nonLatin}</span>` : ''}</div>
+            <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">${summary}${sev || issues || nonLatin ? `<span class="flex flex-wrap gap-1">${sev}${issues}${nonLatin}</span>` : ''}</div>
             <div class="preview mt-1 text-zinc-800 dark:text-zinc-200">${esc(state.sample || f.name)}</div>
           </div>
           <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:flex-col sm:items-end" title="${esc(title)}">
@@ -988,6 +1296,7 @@
           </div>
           <div class="flex flex-wrap gap-1.5 sm:justify-end">
             ${f.tagged ? `<button type="button" class="row-action" data-expand aria-expanded="false">Tags <span class="tabular-nums text-zinc-400">${f.tags.length}</span><svg class="h-3 w-3 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>` : ''}
+            <button type="button" class="row-action" data-propose="${esc(f.name)}" title="Suggested tags and scores, from similar tagged families">Propose</button>
             <button type="button" class="row-action" data-copy="${esc(f.name)}">Copy</button>
             <a class="row-action" href="${esc(specimenUrl(f.name))}" target="_blank" rel="noopener">Specimen <span aria-hidden="true">↗</span></a>
             <a class="row-action" href="${TAGGER_URL}" target="_blank" rel="noopener" data-copy="${esc(f.name)}" data-tagger title="Copies the family name and opens the GF Tagger. Paste it into a “Tags in font” panel.">Tagger <span aria-hidden="true">↗</span></a>
@@ -1078,6 +1387,587 @@
   }, { rootMargin: '200px' });
 
   // ---------------------------------------------------------------------------
+  // Documents: shared pieces
+  // ---------------------------------------------------------------------------
+  // Plain CSS (no Tailwind) so a downloaded document renders the same on its own.
+  const DOC_CSS = `
+.doc{--ink:#18181b;--muted:#52525b;--faint:#a1a1aa;--line:#e4e4e7;--soft:#f4f4f5;--accent:#4f46e5;--accent-soft:#eef2ff;--warn:#b45309;--warn-soft:#fffbeb;--bad:#be123c;--bad-soft:#fff1f2;--high:#c2410c;--high-soft:#fff7ed;--good:#047857;
+  background:#fff;color:var(--ink);font:14px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;max-width:960px;margin:0 auto;padding:48px 56px;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.04);box-sizing:border-box}
+.doc *{box-sizing:border-box}
+.doc h1{font-size:30px;line-height:1.15;margin:4px 0 8px;letter-spacing:-.015em;font-weight:700}
+.doc h2{font-size:21px;line-height:1.25;margin:44px 0 10px;padding-top:18px;border-top:1px solid var(--line);font-weight:650;letter-spacing:-.01em}
+.doc h3{font-size:15px;margin:26px 0 8px;font-weight:650}
+.doc p{margin:8px 0}
+.doc ul,.doc ol{margin:8px 0;padding-left:22px}.doc li{margin:4px 0}
+.doc a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.doc .muted{color:var(--muted)}.doc .faint{color:var(--faint)}.doc .small{font-size:12px}
+.doc .eyebrow{text-transform:uppercase;letter-spacing:.09em;font-size:11px;font-weight:700;color:var(--accent)}
+.doc .lede{font-size:16px;color:var(--muted);max-width:720px}
+.doc table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+.doc th,.doc td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.doc th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.doc .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.doc code,.doc .code{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;font-size:12px}
+.doc pre{background:var(--soft);padding:12px 14px;border-radius:8px;overflow:auto;font-size:12px;line-height:1.55;margin:8px 0;white-space:pre}
+.doc .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600;background:var(--soft);color:var(--muted);white-space:nowrap}
+.doc .sev-4{background:var(--bad-soft);color:var(--bad)}.doc .sev-3{background:var(--high-soft);color:var(--high)}.doc .sev-2{background:var(--warn-soft);color:var(--warn)}.doc .sev-1{background:var(--accent-soft);color:var(--accent)}
+.doc .conf-3{background:#ecfdf5;color:var(--good)}.doc .conf-2{background:var(--accent-soft);color:var(--accent)}.doc .conf-1{background:var(--soft);color:var(--muted)}
+.doc .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.doc .card{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.doc .card .big{font-size:28px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.1}
+.doc .card .label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.doc .ff{font-feature-settings:normal;letter-spacing:normal}
+.doc .fam-name{font-size:20px;line-height:1.25}
+.doc .specimen{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;overflow:hidden}
+.doc .specimen .s1{font-size:44px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc .specimen .s2{font-size:24px;line-height:1.3;margin-top:6px}
+.doc .specimen .s3{font-size:15px;line-height:1.5;margin-top:6px;color:var(--muted)}
+.doc .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:10px 0}
+.doc .nb{border:1px solid var(--line);border-radius:10px;padding:10px 12px;break-inside:avoid}
+.doc .nb .sample{font-size:24px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 6px}
+.doc .nb .name{font-weight:600;font-size:12px}
+.doc .bar{height:6px;background:var(--soft);border-radius:99px;overflow:hidden;margin:4px 0}
+.doc .bar>span{display:block;height:100%;background:var(--accent);border-radius:99px}
+.doc .cls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:10px 0}
+.doc .cls .col{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.doc .cls .col.pick{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.doc .cls .ex{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px dashed var(--line);padding-top:6px;margin-top:6px}
+.doc .cls .ex .sample{font-size:24px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc .scale{margin:14px 0 22px;break-inside:avoid}
+.doc .scale figcaption{font-size:13px;margin-bottom:6px}
+.doc .plot{position:relative;border-bottom:2px solid var(--line);margin:0 6px}
+.doc .band{position:absolute;top:0;bottom:0;background:var(--accent-soft);border-left:1px dashed #a5b4fc;border-right:1px dashed #a5b4fc}
+.doc .mk{position:absolute;white-space:nowrap;font-size:13px;line-height:20px;padding:0 6px;border-radius:6px;background:#fff;border:1px solid var(--line)}
+.doc .mk .tick{position:absolute;bottom:-7px;width:1px;height:6px;background:var(--faint)}
+.doc .mk b{font-family:Inter,system-ui,sans-serif;font-size:11px;color:var(--muted);font-weight:600;margin-left:4px}
+.doc .mk.nbr{border-color:#c7d2fe}
+.doc .mk.cand{background:var(--accent);border-color:var(--accent);color:#fff}
+.doc .mk.cand b{color:#e0e7ff}.doc .mk.cand .tick{background:var(--accent);height:9px;bottom:-10px}
+.doc .axis{position:relative;height:18px;margin:0 6px;font-size:10px;color:var(--faint)}
+.doc .axis span{position:absolute;transform:translateX(-50%);top:3px}
+.doc .ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin:0 6px}
+.doc .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.doc .note.warn{border-color:#f59e0b;background:var(--warn-soft)}
+.doc .toc td{padding:6px 10px}
+.doc .hbar{display:flex;align-items:center;gap:8px}.doc .hbar .bar{flex:1;margin:0}
+.doc .stack{display:flex;height:14px;border-radius:99px;overflow:hidden;margin:8px 0}
+.doc .stack span{display:block;height:100%}
+.doc .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.doc .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.doc svg{max-width:100%;height:auto;display:block}
+.doc .fam{margin-top:8px}
+.doc .fam + .fam{margin-top:56px;padding-top:8px;border-top:3px solid var(--ink)}
+@media (max-width:640px){.doc{padding:24px 18px;border-radius:0}.doc .specimen .s1{font-size:32px}.doc table{display:block;overflow-x:auto}.doc .scale{overflow-x:auto;padding-bottom:4px}.doc .plot,.doc .axis{min-width:640px}}
+@media print{.doc{box-shadow:none;padding:0;max-width:none;border-radius:0}.doc h2,.doc h3{break-after:avoid}.doc .fam + .fam{break-before:page;border-top:0}.doc tr,.doc .nb,.doc .scale,.doc .cls .col,.doc .card{break-inside:avoid}.doc a{color:inherit}}
+`;
+  document.head.insertAdjacentHTML('beforeend', `<style id="doc-css">${DOC_CSS}</style>`);
+
+  // Every bit of text set in a family's own font is recorded, so the document can load
+  // just those letters (Google Fonts' text= subsetting keeps each font to a kilobyte or two).
+  let docFonts = new Map();
+  let docFontHrefs = [];
+  let docFontsReady = Promise.resolve();
+
+  function ff(f, text, cls = '') {
+    if (!docFonts.has(f.preview.q)) docFonts.set(f.preview.q, new Set());
+    const chars = docFonts.get(f.preview.q);
+    for (const ch of text) chars.add(ch);
+    const family = `"${f.name.replace(/["\\]/g, '\\$&')}", system-ui, sans-serif`;
+    return `<span class="ff ${cls}" style="font-family:${esc(family)};font-weight:${f.preview.weight};font-style:${f.preview.italic ? 'italic' : 'normal'}">${esc(text)}</span>`;
+  }
+
+  const fontHref = (entries) => {
+    const chars = new Set();
+    entries.forEach(([, set]) => set.forEach((c) => chars.add(c)));
+    return `https://fonts.googleapis.com/css2?${entries.map(([q]) => 'family=' + q).join('&')}&text=${encodeURIComponent([...chars].join(''))}&display=swap`;
+  };
+
+  function loadStylesheet(href) {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.dataset.docFont = '1';
+      link.onload = () => resolve(href);
+      link.onerror = () => { link.remove(); reject(new Error(href)); };
+      document.head.appendChild(link);
+    });
+  }
+
+  // Batches of 8 families per request; if a batch fails, retry its families one by one.
+  function loadDocFonts() {
+    const entries = [...docFonts];
+    const batches = [];
+    for (let i = 0; i < entries.length; i += 8) batches.push(entries.slice(i, i + 8));
+    docFontHrefs = [];
+    docFontsReady = Promise.all(batches.map((batch) =>
+      loadStylesheet(fontHref(batch)).then((h) => docFontHrefs.push(h))
+        .catch(() => Promise.all(batch.map((e) => loadStylesheet(fontHref([e])).then((h) => docFontHrefs.push(h)).catch(() => {}))))));
+  }
+
+  const sevPill = (level) => `<span class="pill sev-${level}">${SEVERITY[level].label}</span>`;
+  const confPill = (c) => `<span class="pill conf-${c}">${['', 'Low', 'Medium', 'High'][c]}</span>`;
+  const docLink = (hash, text) => `<a href="${esc(appUrl(hash))}">${text}</a>`;
+  const proposalHash = (fams) => 'doc=proposal&for=' + encodeURIComponent(fams.slice(0, MAX_PROPOSAL_FAMILIES).map((f) => f.name).join('|'));
+  const dateText = (ts) => new Date(ts).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' });
+  const SPECIMEN_WORD = 'Hamburgefonstiv';
+
+  // A 0–100 scale for one tag: real fonts placed at their scores, and the proposed score.
+  function scaleDiagram(subject, p, exemplars) {
+    const items = exemplars.map((e) => ({ ...e, label: e.g.name }));
+    const est = (label) => Math.min(48, (label.length * 7.6 + 34) / 8.4); // label width in % of an ~840px plot
+    const lanesEnd = [];
+    for (const it of items) {
+      const w = est(it.label);
+      const start = it.v - (w * it.v) / 100, end = start + w;
+      let lane = lanesEnd.findIndex((e) => e < start - 0.5);
+      if (lane === -1) lane = lanesEnd.length < 4 ? lanesEnd.length : lanesEnd.indexOf(Math.min(...lanesEnd));
+      lanesEnd[lane] = end;
+      it.lane = lane;
+    }
+    const laneH = 30, top = 34;
+    const height = top + Math.max(1, lanesEnd.length) * laneH + 6;
+    const marker = (v, inner, cls, y) =>
+      `<div class="mk ${cls}" style="left:${v}%;top:${y}px;transform:translateX(-${v}%)"><span class="tick" style="left:${v}%"></span>${inner}</div>`;
+    const band = p.lo != null ? `<div class="band" style="left:${p.lo}%;width:${Math.max(1, p.hi - p.lo)}%"></div>` : '';
+    const desc = state.model.stats.descriptions[p.path];
+    return `
+      <figure class="scale">
+        <figcaption><code>${esc(p.path)}</code>${desc ? ` <span class="muted">· ${esc(desc)}</span>` : ''} · proposed <b>${p.score}</b>${p.lo != null ? ` <span class="muted">(similar families ${p.lo}–${p.hi})</span>` : ' <span class="muted">(catalog average; no similar family has this tag)</span>'} ${confPill(p.confidence)}</figcaption>
+        <div class="plot" style="height:${height}px">
+          ${band}
+          ${marker(p.score, `${ff(subject, subject.name)}<b>${p.score}</b>`, 'cand', 4)}
+          ${items.map((it) => marker(it.v, `${ff(it.g, it.label)}<b>${Math.round(it.v)}</b>`, it.kind === 'neighbour' ? 'nbr' : '', top + it.lane * laneH)).join('')}
+        </div>
+        <div class="axis">${[0, 25, 50, 75, 100].map((x) => `<span style="left:${x}%">${x}</span>`).join('')}</div>
+      </figure>`;
+  }
+
+  // Reference fonts for a tag: up to 3 similar families, plus well-known families near the low,
+  // middle and high end of the tag's scores.
+  function exemplarsFor(subject, p) {
+    const idx = similarityIndex();
+    const list = idx.tagValues.get(p.path) || [];
+    const picks = [];
+    const add = (g, v, kind) => { if (g !== subject && !picks.some((x) => x.g === g)) picks.push({ g, v, kind }); };
+    p.vals.slice().sort((a, b) => b.w - a.w).slice(0, 3).forEach((o) => add(o.g, o.v, 'neighbour'));
+    const values = list.map((o) => o.v).sort((a, b) => a - b);
+    const at = (q) => values[Math.floor((values.length - 1) * q)];
+    for (const target of [at(0.05), at(0.5), at(0.95)]) {
+      if (target == null) continue;
+      const near = list.filter((o) => Math.abs(o.v - target) <= 6 && !picks.some((x) => x.g === o.f)).sort((a, b) => byPopularity(a.f, b.f))[0];
+      if (near) add(near.f, near.v, 'reference');
+    }
+    return picks.sort((a, b) => a.v - b.v);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Documents: tagging proposals
+  // ---------------------------------------------------------------------------
+  function proposalDoc(names) {
+    const m = state.model;
+    const fams = names.map((n) => m.byName.get(n)).filter(Boolean);
+    if (!fams.length) return `<h1>No families to propose for</h1><p>None of the requested families are in the catalog.</p>`;
+    const cal = calibrate();
+    const props = fams.map(propose);
+    const totalRows = props.reduce((a, p) => a + p.csv.length, 0);
+    const intro = `
+      <div class="eyebrow">Tagging proposal</div>
+      <h1>${fams.length === 1 ? `Proposed tags for ${esc(fams[0].name)}` : `Proposed tags for ${plural(fams.length, 'family', 'families')}`}</h1>
+      <p class="lede">Suggested tags and scores worked out from how the most similar tagged families are tagged, with diagrams that set each family against real fonts on every tag's 0–100 scale. These are starting points to review in the <a href="${TAGGER_URL}">GF Tagger</a>, not final scores.</p>
+      <p class="muted small">Generated ${esc(dateText(Date.now()))} from data fetched ${esc(dateText(state.meta.fetchedAt))}. ${plural(totalRows, 'suggested row')} in total.</p>`;
+    const toc = fams.length > 1 ? `
+      <h2>Families in this proposal</h2>
+      <table class="toc"><thead><tr><th>Family</th><th>Now</th><th class="num">Suggested rows</th><th>Top classification</th><th>Severity</th></tr></thead><tbody>
+      ${props.map((p) => `<tr><td><a href="#prop-${slug(p.family.name)}">${ff(p.family, p.family.name, 'fam-name')}</a><div class="muted small">${esc(p.family.category)}</div></td>
+        <td class="small">${p.family.tagged ? `${taggerPct(p.family.tagger)} tagger · ${p.family.expected}% expected` : 'No tags'}</td>
+        <td class="num">${p.csv.length}</td>
+        <td>${p.classification[0] ? `<code>${esc(trimSlash(p.classification[0].path))}</code>` : '<span class="faint">—</span>'}</td>
+        <td>${p.family.severity ? sevPill(p.family.severity) : '<span class="faint">—</span>'}</td></tr>`).join('')}
+      </tbody></table>` : '';
+    const allRows = props.flatMap((p) => p.csv);
+    const combined = fams.length > 1 ? `
+      <h2>All suggested families.csv rows</h2>
+      <p class="muted">Every suggested row from the sections below, in the format of <code>tags/all/families.csv</code> (family, axis position, tag, score). Review the scores first; the tagger can also import edits as a pull request.</p>
+      <pre>${esc(allRows.join('\n'))}</pre>` : '';
+    return intro + reliabilityNote(cal) + toc + props.map((p) => proposalSection(p, cal, fams.length > 1)).join('') + combined;
+  }
+
+  const slug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  function reliabilityNote(cal) {
+    return `
+      <div class="note"><b>How far to trust these.</b> The method was checked just now on ${cal.n} families that are already tagged, by hiding their tags and predicting them:
+        suggested Expressive scores were off by <b>${cal.expressiveError.toFixed(0)} points</b> on average (using each tag's catalog average instead: ${cal.expressiveBaseline.toFixed(0)}),
+        Quality scores by <b>${cal.qualityError.toFixed(0)}</b>;
+        ${pct(cal.precision)} of suggested Expressive tags were ones the family really has, and they found ${pct(cal.recall)} of its real ones;
+        the top classification was right ${pct(cal.top1)} of the time and the right one was in the top three ${pct(cal.top3)} of the time.
+        Classification is the weakest part, so pick it by eye from the comparison diagrams.</div>`;
+  }
+
+  function proposalSection(p, cal, many) {
+    const f = p.family, s = state.model.stats;
+    const lead = p.neighbours.slice(0, 3);
+    const relativeText = p.relatives.length
+      ? `Its closest relatives are ${listText(p.relatives.slice(0, 3).map((nb) => `${esc(nb.g.name)} (${esc(nb.why.filter((w) => ['same superfamily', 'related name', 'same designer'].includes(w)).join(', '))})`))}, so the suggestions lean on how those were tagged.`
+      : `It has no close relatives in the catalog (no superfamily, related name or shared designer), so the suggestions come from ${esc(f.category || 'similar')} families like ${listText(lead.map((nb) => esc(nb.g.name)))} and sit close to what's typical; check them carefully.`;
+    const now = f.tagged
+      ? `${esc(f.name)} has ${plural(f.tags.length, 'tag')} (tagger ${taggerPct(f.tagger)}, expected ${f.expected}%)${f.issues.length ? `, with ${listText(f.issues.map((i) => i.label.toLowerCase()))}` : ''}.`
+      : `${esc(f.name)} has no tags yet.`;
+    const counts = [];
+    if (p.quality.length) counts.push(plural(p.quality.length, 'Quality tag'));
+    if (p.tags.length) counts.push(plural(p.tags.length, 'more tag', 'more tags').replace('more ', p.tags.every((t) => t.group === 'Expressive') ? 'Expressive ' : ''));
+    if (p.classification[0]) counts.push(`a classification (${esc(p.classification[0].path)}, backed by ${pct(p.classification[0].support)} of the weighted vote)`);
+    const high = [...p.quality, ...p.tags].filter((x) => x.confidence === 3).length;
+    const summary = counts.length
+      ? `This proposal suggests ${listText(counts)}. ${high ? `${plural(high, 'suggestion')} ${high === 1 ? 'has' : 'have'} high confidence.` : 'None of the suggestions has high confidence, so treat them as a rough first pass.'}`
+      : `Its similar families don't point to any missing tags, so there's nothing to add${p.disagreements.length ? ', but a few existing scores are worth a second look (below)' : ''}.`;
+
+    const head = `
+      <section class="fam" id="prop-${slug(f.name)}">
+        ${many ? '<div class="eyebrow">Tagging proposal</div>' : ''}
+        <h2 style="${many ? 'border-top:0;margin-top:8px;padding-top:0' : ''}">${ff(f, f.name, 'fam-name')}${f.latin ? '' : ` <span class="muted small" style="font-weight:500">${esc(f.name)}</span>`}</h2>
+        <p class="muted small">${esc(f.category || 'Uncategorized')}${f.designers.length ? ` · ${esc(f.designers.join(', '))}` : ''}${f.added ? ` · added ${esc(f.added)}` : ''}${Number.isFinite(popularityOf(f)) ? ` · #${fmt.format(f.popularity)} in popularity` : ''}${f.axes.length ? ` · variable (${esc(f.axes.join(', '))})` : ''}${f.severity ? ` · ${sevPill(f.severity)}` : ''}</p>
+        <div class="specimen">
+          <div class="s1">${ff(f, 'The quick brown fox jumps')}</div>
+          <div class="s2">${ff(f, SPECIMEN_WORD + ' 0123456789')}</div>
+          <div class="s3">${ff(f, 'Sphinx of black quartz, judge my vow. Pack my box with five dozen liquor jugs.')}</div>
+          ${f.latin ? '' : '<p class="small muted">This family has no Latin glyphs, so the samples above fall back to a system font.</p>'}
+        </div>
+        <h3>Summary</h3>
+        <p>${now} ${relativeText} ${summary}</p>
+        ${f.axes.length ? `<p class="muted small">This is a variable font. The tagger can score a tag at specific axis positions; these suggestions are single scores, so for tags that change across ${esc(f.axes.join(' or '))}, score the extremes in the tagger instead.</p>` : ''}`;
+
+    const neighbours = `
+      <h3>Most similar tagged families</h3>
+      <p class="muted small">The ${p.neighbours.length} tagged families most like ${esc(f.name)} by catalog metadata, each set in its own font. The bar shows how similar each one is; closer families count much more in the suggestions.</p>
+      <div class="grid">
+        ${p.neighbours.map((nb) => `
+          <div class="nb">
+            <div class="sample">${ff(nb.g, SPECIMEN_WORD)}</div>
+            <div class="name">${esc(nb.g.name)}</div>
+            <div class="bar"><span style="width:${Math.round((nb.sim / MAX_SIMILARITY) * 100)}%"></span></div>
+            <div class="small muted">${esc(nb.why.join(' · ') || 'similar style')} · tagger ${taggerPct(nb.g.tagger)}</div>
+          </div>`).join('')}
+      </div>`;
+
+    let classification = '';
+    if (p.classification.length) {
+      const idx = similarityIndex();
+      const examplesFor = (c) => {
+        const fromNeighbours = c.vals.slice().sort((a, b) => b.w - a.w).map((o) => o.g);
+        const popular = (idx.tagValues.get(c.path) || []).map((o) => o.f).filter((g) => g.category === f.category).sort(byPopularity);
+        const picks = [];
+        for (const g of [...fromNeighbours, ...popular]) if (g !== f && !picks.includes(g) && picks.length < 3) picks.push(g);
+        return picks;
+      };
+      classification = `
+        <h3>Classification</h3>
+        <p>${f.tagged ? `${esc(f.name)} has no tag in ${esc(f.parts.expected.label)}.` : `${esc(f.name)} needs a classification tag.`} The three candidates its similar families use most are below, each with fonts that carry it. Pick the column ${esc(f.name)} looks most like; the first is the suggestion.</p>
+        <div class="specimen" style="padding:10px 14px"><div class="s2">${ff(f, SPECIMEN_WORD)}</div><div class="small muted">${esc(f.name)}</div></div>
+        <div class="cls">
+          ${p.classification.map((c, i) => `
+            <div class="col ${i === 0 ? 'pick' : ''}">
+              <div><code>${esc(c.path)}</code> ${i === 0 ? '<span class="pill conf-2">Suggested</span>' : ''}</div>
+              <div class="small muted">${pct(c.support)} of the weighted vote · typical score ${c.score} · ${confPill(c.confidence)}</div>
+              ${examplesFor(c).map((g) => `<div class="ex"><span class="sample">${ff(g, SPECIMEN_WORD)}</span><span class="small muted">${esc(g.name)}</span></div>`).join('')}
+            </div>`).join('')}
+        </div>`;
+    }
+
+    const scored = [...p.quality, ...p.tags];
+    const table = scored.length || p.classification.length ? `
+      <h3>Suggested tags</h3>
+      <table>
+        <thead><tr><th>Tag</th><th class="num">Score</th><th class="num">Similar families</th><th class="num">Support</th><th>Confidence</th></tr></thead>
+        <tbody>
+          ${[...scored, ...(p.classification[0] ? [p.classification[0]] : [])].map((x) => `<tr>
+            <td><code>${esc(x.path)}</code>${s.descriptions[x.path] ? `<div class="small muted">${esc(s.descriptions[x.path])}</div>` : ''}</td>
+            <td class="num"><b>${x.score}</b></td>
+            <td class="num">${x.lo != null ? `${x.lo}–${x.hi}` : '<span class="faint">catalog avg</span>'}</td>
+            <td class="num">${x.count ? `${x.count} of ${p.neighbours.length}` : '—'}</td>
+            <td>${confPill(x.confidence)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      <p class="small muted">Score is the similarity-weighted average of the similar families that have the tag; the range is one standard deviation either side. Similar families vote with weights that grow steeply with similarity, so close relatives count most. Confidence is High when at least 70% of the weighted vote agrees and the spread is 15 points or less${p.relatives.length ? '' : ' (capped at Medium here, as there are no close relatives)'}, Medium at 50% and 25 points.</p>` : '';
+
+    const diagrams = scored.length ? `
+      <h3>Where ${esc(f.name)} would sit</h3>
+      <p class="muted small">Each scale shows the suggested score (filled), the range across similar families (shaded), similar families that have the tag (outlined in blue) and well-known fonts at the low, middle and high end, all set in their own fonts.</p>
+      ${scored.slice(0, 14).map((x) => scaleDiagram(f, x, exemplarsFor(f, x))).join('')}
+      ${scored.length > 14 ? `<p class="muted small">${scored.length - 14} more suggestions are in the table above.</p>` : ''}` : '';
+
+    const maybe = p.maybe.length ? `
+      <h3>Worth considering</h3>
+      <p class="muted small">Tags with 30–50% of the weighted vote. Not in the suggested rows.</p>
+      <p>${p.maybe.map((x) => `<code>${esc(x.path)}</code> <span class="muted small">~${x.score} (${pct(x.support)})</span>`).join(' · ')}</p>` : '';
+
+    const disagreements = p.disagreements.length ? `
+      <h3>Existing scores worth a second look</h3>
+      <p class="muted small">Tags ${esc(f.name)} already has, scored 30+ points away from what at least 3 similar families give them. Not necessarily wrong, but worth checking.</p>
+      <table><thead><tr><th>Tag</th><th class="num">${esc(f.name)}</th><th class="num">Similar families</th></tr></thead><tbody>
+        ${p.disagreements.slice(0, 8).map((d) => `<tr><td><code>${esc(d.tag.path)}</code></td><td class="num">${esc(d.tag.score)}</td><td class="num">${d.peer.score} (${d.peer.lo}–${d.peer.hi})</td></tr>`).join('')}
+      </tbody></table>` : '';
+
+    const rows = p.csv.length ? `
+      <h3>families.csv rows</h3>
+      <p class="muted small">Ready to paste into <code>tags/all/families.csv</code> once reviewed: the suggested Quality and other tags${p.classification[0] ? ', plus the suggested classification' : ''}. Static rows (no axis position).</p>
+      <pre>${esc(p.csv.join('\n'))}</pre>` : '';
+
+    return head + neighbours + classification + table + diagrams + maybe + disagreements + rows + '</section>';
+  }
+
+  // ---------------------------------------------------------------------------
+  // Documents: severity report
+  // ---------------------------------------------------------------------------
+  function severityDoc() {
+    const m = state.model, t = m.totals, s = m.stats, ts = s.tagger;
+    const fams = m.families;
+    const levels = [4, 3, 2, 1].map((level) => ({ level, fams: fams.filter((f) => f.severity === level).sort(byPopularity) }));
+    const count = (level) => levels.find((l) => l.level === level).fams.length;
+    const anyGap = fams.filter((f) => f.severity >= 2);
+    const untagged = levels[0].fams;
+    const added = untagged.map((f) => f.added).filter(Boolean).sort();
+    const classMissing = fams.filter((f) => hasIssue(f, 'classification'));
+    const strongCls = classMissing.filter((f) => f.parts.expected !== ANY_CLASSIFICATION).sort(byPopularity);
+    const displayCls = classMissing.filter((f) => f.parts.expected === ANY_CLASSIFICATION).sort(byPopularity);
+    const classByCat = CATEGORIES.map((c) => [c, classMissing.filter((f) => f.category === c).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
+    const qualityMissing = fams.filter((f) => hasIssue(f, 'quality'));
+    const thin = fams.filter((f) => hasIssue(f, 'expressive'));
+    const leastExpressive = m.expressiveVocab.slice().reverse().slice(0, 4);
+    const colours = { 4: '#be123c', 3: '#ea580c', 2: '#f59e0b', 1: '#818cf8', 0: '#e4e4e7' };
+
+    const findings = [];
+    if (untagged.length) findings.push(`<b>${plural(untagged.length, 'family', 'families')} ${untagged.length === 1 ? 'has' : 'have'} no tags at all</b>${added.length ? `, all added between ${esc(added[0])} and ${esc(added[added.length - 1])}` : ''}.`);
+    if (count(3)) findings.push(`<b>${plural(count(3), 'more family', 'more families')}</b> ${count(3) === 1 ? 'is' : 'are'} missing tags that nearly every family has: ${[qualityMissing.length ? `${qualityMissing.length} without all Quality tags` : '', strongCls.length ? `${strongCls.length} Sans Serif, Serif, Handwriting or Monospace families without the classification tag their category calls for` : ''].filter(Boolean).join(' and ')}${qualityMissing.length && strongCls.some((f) => hasIssue(f, 'quality')) ? ' (some have both)' : ''}.`);
+    if (classMissing.length) findings.push(`Missing classification is the most common gap (${plural(classMissing.length, 'family', 'families')}): ${classByCat.map(([c, n]) => `${n} ${esc(c)}`).join(', ')}.`);
+    if (thin.length) findings.push(`${plural(thin.length, 'family', 'families')} ${thin.length === 1 ? 'has' : 'have'} ${THIN_EXPRESSIVE} or fewer Expressive tags, against a median of ${s.expressiveMedian}.`);
+    findings.push(`The least-scored Expressive tags across the catalog are ${listText(leastExpressive.map((p) => `<code>${esc(leaf(p))}</code> (${pct(s.share(p))})`))} of tagged families.`);
+    findings.push(`On the tagger's own measure the catalog is <b>${ts.completeness.toFixed(1)}% complete</b>; the median family has ${taggerPct(ts.median)} of the ${ts.total} tags.`);
+
+    const head = `
+      <div class="eyebrow">Severity report</div>
+      <h1>Where Google Fonts tagging is lacking</h1>
+      <p class="lede">Every family in the catalog checked against the tag database, with the gaps ranked by how sure we can be that tags are missing. Within each level, the most-used families come first, since gaps there affect the most people.</p>
+      <p class="muted small">Generated ${esc(dateText(Date.now()))} from data fetched ${esc(dateText(state.meta.fetchedAt))}: ${fmt.format(t.catalog)} catalog families, ${fmt.format(t.tagged)} with tags. Sources: <a href="${META_URL}">Google Fonts catalog</a>, <a href="${CSV_URL}">families.csv</a>, <a href="https://github.com/googlefonts/tagger">GF Tagger</a> tag list.</p>
+      <div class="cards">
+        ${[4, 3, 2, 1].map((l) => `<div class="card"><div class="label">${SEVERITY[l].label}</div><div class="big" style="color:${colours[l]}">${fmt.format(count(l))}</div><div class="small muted">${sharePct(count(l) / t.catalog)} of the catalog</div></div>`).join('')}
+        <div class="card"><div class="label">No gaps found</div><div class="big">${fmt.format(fams.filter((f) => !f.severity).length)}</div><div class="small muted">${sharePct(fams.filter((f) => !f.severity).length / t.catalog)} of the catalog</div></div>
+      </div>
+      <div class="stack">${[4, 3, 2, 1, 0].map((l) => { const n = fams.filter((f) => f.severity === l).length; return n ? `<span title="${l ? SEVERITY[l].label : 'No gaps'}: ${n}" style="width:${(n / t.catalog) * 100}%;background:${colours[l]}"></span>` : ''; }).join('')}</div>
+      <div class="legend">${[4, 3, 2, 1, 0].map((l) => `<span><i style="background:${colours[l]}"></i>${l ? SEVERITY[l].label : 'No gaps'}</span>`).join('')}</div>
+      <h2>Key findings</h2>
+      <ul>${findings.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+
+    const definitions = `
+      <h2>How severity is assigned</h2>
+      <table><thead><tr><th>Level</th><th>Rule</th><th>Why</th><th class="num">Families</th></tr></thead><tbody>
+        <tr><td>${sevPill(4)}</td><td>No rows in families.csv.</td><td>Tag-based browsing and filters can't surface the family at all.</td><td class="num">${count(4)}</td></tr>
+        <tr><td>${sevPill(3)}</td><td>Missing a <code>/Quality</code> tag; or a Sans Serif, Serif, Handwriting or Monospace family with no tag in its classification group.</td><td>${pct(s.qualityFullShare)} of tagged families have every Quality tag, and ${pct(Math.min(...['Sans Serif', 'Serif', 'Handwriting', 'Monospace'].map((c) => s.classificationShare[c] || 0)))}–${pct(Math.max(...['Sans Serif', 'Serif', 'Handwriting', 'Monospace'].map((c) => s.classificationShare[c] || 0)))} of those categories are classified, so a gap is almost certainly an omission.</td><td class="num">${count(3)}</td></tr>
+        <tr><td>${sevPill(2)}</td><td>${THIN_EXPRESSIVE} or fewer <code>/Expressive</code> tags; or a Display family with no classification tag.</td><td>Probably under-tagged: 3 in 4 families have ${s.expressiveTarget}+ Expressive tags, and ${pct(s.classificationShare.Display || 0)} of Display families are classified.</td><td class="num">${count(2)}</td></tr>
+        <tr><td>${sevPill(1)}</td><td>No flagged gaps, but in the bottom 10% of tagged families by tagger % (under ${taggerPct(ts.p10)}).</td><td>Thinly tagged compared with the rest of the catalog; worth a pass when time allows.</td><td class="num">${count(1)}</td></tr>
+      </tbody></table>
+      <p class="muted small">Families with a <code>/Special use</code> tag (barcodes, redaction, symbols) aren't flagged for Expressive or classification gaps.</p>`;
+
+    const distribution = `
+      <h2>Coverage across the catalog</h2>
+      <p>How many of the tagger's ${ts.total} tags each family has, as a share. Most families sit between 15% and 25%; the dashed lines mark the bottom 10% (${taggerPct(ts.p10)}) and the median (${taggerPct(ts.median)}).</p>
+      ${histogram(fams, ts)}
+      <h3>Expected coverage</h3>
+      <p class="muted small">Share of families at each Expected level (Quality, Expressive and Classification parts averaged).</p>
+      ${expectedStack(fams)}`;
+
+    const sections = levels.map(({ level, fams: list }) => severitySection(level, list)).join('');
+
+    const tagsSection = `
+      <h2>Gaps by tag</h2>
+      <p>Share of tagged families scored on each tag. Expressive tags are picked selectively, so low numbers aren't all omissions, but the least-used ones are where a focused pass in the tagger's Todo panel (filtered to one tag) would add the most.</p>
+      <h3>Expressive</h3>
+      ${tagBars(m.expressiveVocab.slice().sort((a, b) => s.share(a) - s.share(b)), s)}
+      <h3>Quality</h3>
+      ${tagBars(s.qualityExpected, s)}
+      <h3>Classification, by category</h3>
+      <table><thead><tr><th>Category</th><th>Expected group</th><th>Classified</th><th class="num">Missing</th></tr></thead><tbody>
+        ${CATEGORIES.map((c) => `<tr><td>${esc(c)}</td><td><code>${esc(expectedFor(c).label)}</code></td><td><div class="hbar"><div class="bar"><span style="width:${(s.classificationShare[c] || 0) * 100}%"></span></div><span class="num small">${pct(s.classificationShare[c] || 0)}</span></div></td><td class="num">${classMissing.filter((f) => f.category === c).length}</td></tr>`).join('')}
+      </tbody></table>`;
+
+    const cats = `
+      <h2>Gaps by category</h2>
+      <table><thead><tr><th>Category</th><th class="num">Families</th><th class="num">Critical</th><th class="num">High</th><th class="num">Medium</th><th class="num">Low</th><th class="num">Avg tagger %</th></tr></thead><tbody>
+        ${CATEGORIES.map((c) => { const list = fams.filter((f) => f.category === c); const by = (l) => list.filter((f) => f.severity === l).length; return `<tr><td>${esc(c)}</td><td class="num">${fmt.format(list.length)}</td><td class="num">${by(4)}</td><td class="num">${by(3)}</td><td class="num">${by(2)}</td><td class="num">${by(1)}</td><td class="num">${taggerPct(list.reduce((a, f) => a + f.tagger, 0) / Math.max(list.length, 1))}</td></tr>`; }).join('')}
+      </tbody></table>`;
+
+    const years = [...new Set(fams.map((f) => (f.added || '').slice(0, 4)).filter(Boolean))].sort();
+    const byYear = `
+      <h2>Gaps by year added</h2>
+      <p>Share of each year's additions with a gap of Medium severity or worse. Newer additions are where untagged and thinly tagged families accumulate.</p>
+      <table><thead><tr><th>Year</th><th class="num">Added</th><th class="num">With gaps</th><th>Share</th></tr></thead><tbody>
+        ${years.slice(-10).reverse().map((y) => { const list = fams.filter((f) => (f.added || '').startsWith(y)); const g = list.filter((f) => f.severity >= 2).length; return `<tr><td>${y}</td><td class="num">${list.length}</td><td class="num">${g}</td><td><div class="hbar"><div class="bar"><span style="width:${(g / Math.max(list.length, 1)) * 100}%;background:${g / Math.max(list.length, 1) > 0.15 ? '#f59e0b' : '#4f46e5'}"></span></div><span class="num small">${pct(g / Math.max(list.length, 1))}</span></div></td></tr>`; }).join('')}
+      </tbody></table>`;
+
+    const steps = [];
+    if (untagged.length) steps.push(`<b>Tag the ${plural(untagged.length, 'untagged family', 'untagged families')}.</b> ${docLink(proposalHash(untagged), 'Open proposals for all of them')}.`);
+    if (qualityMissing.length) steps.push(`<b>Add the missing Quality tags</b> to ${listText(qualityMissing.slice(0, 6).map((f) => esc(f.name)))}${qualityMissing.length > 6 ? ` and ${qualityMissing.length - 6} more` : ''}. ${docLink(proposalHash(qualityMissing), 'Proposals')}.`);
+    if (strongCls.length) steps.push(`<b>Classify ${plural(strongCls.length, 'Sans Serif, Serif, Handwriting or Monospace family', 'Sans Serif, Serif, Handwriting and Monospace families')}</b>, most popular first (${listText(strongCls.slice(0, 3).map((f) => esc(f.name)))}…). ${docLink('gap=classification&sort=severity', 'See them in the list')} or ${docLink(proposalHash(strongCls), `open proposals for the top ${Math.min(strongCls.length, MAX_PROPOSAL_FAMILIES)}`)}.`);
+    if (thin.length) steps.push(`<b>Score more Expressive tags</b> for the ${plural(thin.length, 'family', 'families')} with ${THIN_EXPRESSIVE} or fewer. ${docLink('gap=expressive&sort=severity', 'See them')} · ${docLink(proposalHash(thin.sort(byPopularity)), 'proposals')}.`);
+    if (displayCls.length) steps.push(`<b>Classify ${plural(displayCls.length, 'Display family', 'Display families')}</b> under <code>/Theme</code>, <code>/Sans</code>, <code>/Serif</code> or <code>/Script</code>. ${docLink(proposalHash(displayCls), 'Proposals')}.`);
+    steps.push(`<b>Run focused passes on the least-used Expressive tags</b> (${listText(leastExpressive.slice(0, 3).map((p) => `<code>${esc(leaf(p))}</code>`))}) using the tagger's Todo panel with that tag as the filter.`);
+    if (count(1)) steps.push(`<b>Review the ${plural(count(1), 'thinly tagged family', 'thinly tagged families')}</b> in the Low section when time allows. ${docLink('sort=least', 'Least tagged first')}.`);
+    const next = `<h2>Recommended next steps</h2><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol>`;
+
+    return head + definitions + next + distribution + sections + tagsSection + cats + byYear;
+  }
+
+  function severitySection(level, list) {
+    if (!list.length) return `<h2>${SEVERITY[level].label}</h2><p class="muted">No families at this level.</p>`;
+    const titles = { 4: 'Untagged families', 3: 'Missing tags nearly every family has', 2: 'Probably under-tagged', 1: 'Thinly tagged' };
+    const intros = {
+      4: 'These families have no rows in families.csv. They are the highest priority: until they have tags, tag-based browsing can\'t surface them.',
+      3: 'These families are missing a Quality tag, or the classification tag their category almost always has.',
+      2: `These families have ${THIN_EXPRESSIVE} or fewer Expressive tags, or are Display families with no classification tag.`,
+      1: 'No specific tag is flagged, but these families have fewer tags than 90% of the catalog.',
+    };
+    const reasons = (f) => (f.severity === 1
+      ? `${f.taggerCount} of ${state.model.stats.tagger.total} tags`
+      : f.issues.map((i) => esc(i.label)).join('; '));
+    return `
+      <h2>${sevPill(level)} ${titles[level]} (${fmt.format(list.length)})</h2>
+      <p>${intros[level]} Ordered by popularity, most-used first. ${docLink(proposalHash(list), list.length > MAX_PROPOSAL_FAMILIES ? `Proposals for the top ${MAX_PROPOSAL_FAMILIES}` : 'Proposals for all of them')}.</p>
+      <table><thead><tr><th class="num">#</th><th>Family</th><th class="num">Popularity</th><th class="num">Tagger</th><th class="num">Expected</th><th>What's missing</th><th></th></tr></thead><tbody>
+        ${list.map((f, i) => `<tr>
+          <td class="num faint">${i + 1}</td>
+          <td>${ff(f, f.name, 'fam-name')}<div class="small muted">${esc(f.name)} · ${esc(f.category || 'Uncategorized')}${f.added ? ` · added ${esc(f.added)}` : ''}</div></td>
+          <td class="num">${Number.isFinite(popularityOf(f)) ? '#' + fmt.format(f.popularity) : '—'}</td>
+          <td class="num">${taggerPct(f.tagger)}</td>
+          <td class="num">${f.expected}%</td>
+          <td class="small">${reasons(f)}</td>
+          <td class="small">${docLink(proposalHash([f]), 'Proposal')}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  function histogram(fams, ts) {
+    const binW = 2, max = Math.max(36, Math.ceil(ts.max / binW) * binW);
+    const bins = Array.from({ length: max / binW }, (_, i) => ({ lo: i * binW, n: 0 }));
+    let zero = 0;
+    fams.forEach((f) => { if (f.tagger === 0) zero++; else bins[Math.min(bins.length - 1, Math.floor(f.tagger / binW))].n++; });
+    const W = 840, H = 190, L = 34, B = 26, T = 10;
+    const top = Math.max(zero, ...bins.map((b) => b.n));
+    const x = (p) => L + (p / max) * (W - L - 6);
+    const y = (n) => T + (H - T - B) * (1 - n / top);
+    const bars = bins.map((b) => `<rect x="${x(b.lo) + 1}" y="${y(b.n)}" width="${x(binW) - x(0) - 2}" height="${H - B - y(b.n)}" fill="${b.lo + binW <= ts.p10 ? '#f59e0b' : '#6366f1'}"><title>${b.lo}–${b.lo + binW}%: ${b.n} families</title></rect>`).join('');
+    const zeroBar = zero ? `<rect x="${x(0) - 7}" y="${y(zero)}" width="6" height="${H - B - y(zero)}" fill="#be123c"><title>0%: ${zero} untagged families</title></rect><text x="${x(0) - 4}" y="${y(zero) - 5}" font-size="10" fill="#be123c" text-anchor="start">${zero} untagged</text>` : '';
+    const ticks = Array.from({ length: max / 5 + 1 }, (_, i) => i * 5).map((p) => `<text x="${x(p)}" y="${H - 8}" font-size="10" text-anchor="middle" fill="#71717a">${p}%</text>`).join('');
+    const yTicks = [0, Math.round(top / 2), top].map((n) => `<text x="${L - 6}" y="${y(n) + 3}" font-size="10" text-anchor="end" fill="#71717a">${n}</text>`).join('');
+    const line = (p, label) => `<line x1="${x(p)}" x2="${x(p)}" y1="${T}" y2="${H - B}" stroke="#18181b" stroke-dasharray="3 3" stroke-width="1"/><text x="${x(p) + 4}" y="${T + 10}" font-size="10" fill="#18181b">${label}</text>`;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histogram of tagger coverage across the catalog" font-family="Inter, system-ui, sans-serif">
+      <line x1="${L}" x2="${W - 6}" y1="${H - B}" y2="${H - B}" stroke="#d4d4d8"/>${zeroBar}${bars}${ticks}${yTicks}
+      ${line(ts.p10, 'bottom 10%')}${line(ts.median, 'median')}</svg>
+      <div class="legend"><span><i style="background:#be123c"></i>Untagged (0%)</span><span><i style="background:#f59e0b"></i>Bottom 10%</span><span><i style="background:#6366f1"></i>Rest of the catalog</span></div>`;
+  }
+
+  function expectedStack(fams) {
+    const parts = EXPECTED_PCT_FILTERS.slice(1).map((o, i) => ({ label: o.label.replace('Expected ', ''), n: fams.filter((f) => o.test(f.expected)).length, colour: ['#be123c', '#ea580c', '#f59e0b', '#818cf8', '#10b981'][i] }));
+    return `<div class="stack">${parts.map((p) => (p.n ? `<span title="${esc(p.label)}: ${p.n}" style="width:${(p.n / fams.length) * 100}%;background:${p.colour}"></span>` : '')).join('')}</div>
+      <div class="legend">${parts.map((p) => `<span><i style="background:${p.colour}"></i>${esc(p.label)}: ${fmt.format(p.n)}</span>`).join('')}</div>`;
+  }
+
+  function tagBars(paths, s) {
+    return `<table><tbody>${paths.map((p) => `<tr><td style="width:38%"><code>${esc(leaf(p))}</code>${s.descriptions[p] ? ` <span class="small muted">${esc(s.descriptions[p])}</span>` : ''}</td><td><div class="hbar"><div class="bar"><span style="width:${s.share(p) * 100}%"></span></div><span class="num small" style="width:44px">${pct(s.share(p))}</span></div></td><td class="num small">${fmt.format(Math.round(s.share(p) * s.taggedCount))} families</td></tr>`).join('')}</tbody></table>`;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Documents: open, print, download
+  // ---------------------------------------------------------------------------
+  function docNames() {
+    return state.docFor.split('|').map((n) => n.trim()).filter(Boolean).slice(0, MAX_PROPOSAL_FAMILIES);
+  }
+
+  function renderDoc() {
+    const open = !!(state.doc && state.model);
+    $('#doc-view').classList.toggle('hidden', !open);
+    $('#app-main').classList.toggle('hidden', open);
+    if (!open) {
+      if (state.renderedDoc) document.title = 'Untagger · Google Fonts tag coverage';
+      state.renderedDoc = '';
+      return;
+    }
+    const key = `${state.doc}|${state.docFor}|${state.meta.fetchedAt}`;
+    if (key === state.renderedDoc) return;
+    state.renderedDoc = key;
+    docFonts = new Map();
+    let html, title;
+    try {
+      if (state.doc === 'report') {
+        html = severityDoc();
+        title = 'Severity report';
+      } else {
+        const names = docNames();
+        html = proposalDoc(names);
+        title = names.length === 1 ? `Proposal: ${names[0]}` : `Proposals for ${names.length} families`;
+      }
+    } catch (err) {
+      console.error(err);
+      html = `<h1>Couldn't build this document</h1><p>${esc(err.message)}</p>`;
+      title = 'Error';
+    }
+    $('#doc').innerHTML = html;
+    $('#doc-title').textContent = title;
+    document.title = `${title} · Untagger`;
+    $('#doc-copy').classList.toggle('hidden', state.doc !== 'proposal');
+    loadDocFonts();
+    window.scrollTo(0, 0);
+  }
+
+  function openDoc(doc, names = []) {
+    Object.assign(state, { doc, docFor: names.slice(0, MAX_PROPOSAL_FAMILIES).join('|') });
+    render(true);
+  }
+
+  function closeDoc() {
+    if (history.state && history.state.fromApp) { history.back(); return; }
+    Object.assign(state, { doc: '', docFor: '' });
+    render();
+  }
+
+  function docFileName(ext) {
+    const stamp = new Date().toISOString().slice(0, 10);
+    if (state.doc === 'report') return `untagger-severity-report-${stamp}.${ext}`;
+    const names = docNames();
+    return `untagger-proposal-${names.length === 1 ? slug(names[0]) : names.length + '-families'}-${stamp}.${ext}`;
+  }
+
+  async function downloadDoc() {
+    await docFontsReady;
+    const title = $('#doc-title').textContent;
+    const links = docFontHrefs.map((h) => `<link rel="stylesheet" href="${esc(h)}">`).join('\n');
+    const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(title)} · Untagger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+${links}
+<style>body{margin:0;background:#f4f4f5;padding:24px 8px}${DOC_CSS}</style>
+</head>
+<body>
+${$('#doc').outerHTML}
+</body>
+</html>
+`;
+    download(docFileName('html'), 'text/html;charset=utf-8', html);
+  }
+
+  async function printDoc() {
+    toast('Loading fonts for printing…');
+    await docFontsReady;
+    await document.fonts.ready;
+    window.print();
+  }
+
+  // ---------------------------------------------------------------------------
   // Banner / toast
   // ---------------------------------------------------------------------------
   function hideBanner() { const b = $('#banner'); b.classList.add('hidden'); b.innerHTML = ''; }
@@ -1150,6 +2040,7 @@
       taggerTags: f.taggerCount,
       expectedPct: f.expected,
       status: statusOf(f),
+      severity: f.severity ? SEVERITY[f.severity].key : null,
       gaps: f.issues.map((i) => ({ type: i.key, label: i.label, detail: i.why })),
       missingQualityTags: p ? p.qMissing : [],
       expressiveScored: p ? p.eCount : 0,
@@ -1175,10 +2066,10 @@
     } else if (kind === 'txt') {
       download(base + '.txt', 'text/plain;charset=utf-8', names);
     } else if (kind === 'csv') {
-      const header = ['family', 'category', 'tagger_pct', 'tagger_tags', 'expected_pct', 'status', 'gaps', 'missing_quality_tags', 'expressive_scored', 'quality_scored', 'classification_tags', 'date_added', 'specimen_url'];
+      const header = ['family', 'category', 'tagger_pct', 'tagger_tags', 'expected_pct', 'status', 'severity', 'gaps', 'missing_quality_tags', 'expressive_scored', 'quality_scored', 'classification_tags', 'date_added', 'specimen_url'];
       const lines = rows.map((f) => {
         const r = exportRecord(f);
-        return [r.family, r.category, r.taggerPct, `${r.taggerTags}/${ts.total}`, r.expectedPct, r.status, r.gaps.map((g) => g.label).join('; '),
+        return [r.family, r.category, r.taggerPct, `${r.taggerTags}/${ts.total}`, r.expectedPct, r.status, r.severity || '', r.gaps.map((g) => g.label).join('; '),
           r.missingQualityTags.join('; '), r.expressiveScored, r.qualityScored, r.classificationTags.join('; '), r.dateAdded, r.specimenUrl].map(csvCell).join(',');
       });
       download(base + '.csv', 'text/csv;charset=utf-8', [header.join(','), ...lines].join('\n') + '\n');
@@ -1206,8 +2097,8 @@
     const left = cooldownLeft();
     const btn = $('#refresh');
     btn.disabled = left > 0 || state.loading;
-    $('#refresh-label').textContent = left > 0 ? `Refresh in ${Math.ceil(left / 1000)}s` : state.loading ? 'Loading…' : 'Refresh';
-    btn.title = left > 0 ? 'Cooldown to avoid rate limits' : 'Fetch fresh data, ignoring the 24 h cache';
+    $('#refresh-label').textContent = state.loading ? 'Loading…' : left > 0 ? (state.refreshFailed ? 'Failed' : 'Updated') : 'Refresh';
+    btn.title = 'Fetch fresh data, ignoring the 24 h cache';
   }
   setInterval(tickCooldown, 500);
 
@@ -1223,7 +2114,8 @@
     if (cooldownLeft() > 0 || state.loading) return;
     store.set(COOLDOWN_KEY, String(Date.now()));
     tickCooldown();
-    await load({ fresh: true });
+    state.refreshFailed = !(await load({ fresh: true }));
+    store.set(COOLDOWN_KEY, String(Date.now()));
     tickCooldown();
   });
 
@@ -1257,14 +2149,41 @@
     });
   });
 
-  document.querySelectorAll('.export-btn').forEach((btn) =>
+  document.querySelectorAll('.export-btn[data-export]').forEach((btn) =>
     btn.addEventListener('click', () => doExport(btn.dataset.export)));
+
+  $('#open-report').addEventListener('click', () => state.model && openDoc('report'));
+  $('#propose-list').addEventListener('click', () => {
+    const rows = currentRows();
+    if (rows.length) openDoc('proposal', rows.slice(0, MAX_PROPOSAL_FAMILIES).map((f) => f.name));
+  });
+  $('#doc-back').addEventListener('click', closeDoc);
+  // In-document links ("#prop-…") would otherwise replace the app's hash state.
+  $('#doc').addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#prop-"]');
+    if (!a) return;
+    e.preventDefault();
+    const target = document.getElementById(a.getAttribute('href').slice(1));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  $('#doc-print').addEventListener('click', printDoc);
+  $('#doc-download').addEventListener('click', downloadDoc);
+  $('#doc-copy').addEventListener('click', async () => {
+    const rows = [...$('#doc').querySelectorAll('section.fam pre')].map((pre) => pre.textContent.trim()).filter(Boolean).join('\n');
+    toast(rows && (await copyText(rows + '\n')) ? `Copied ${plural(rows.split('\n').length, 'row')}` : 'Nothing to copy');
+  });
 
   $('#list').addEventListener('click', (e) => {
     const more = e.target.closest('#more');
     if (more) {
       state.limit += PAGE_SIZE;
       renderList();
+      return;
+    }
+
+    const proposeBtn = e.target.closest('[data-propose]');
+    if (proposeBtn) {
+      openDoc('proposal', [proposeBtn.dataset.propose]);
       return;
     }
 
@@ -1304,13 +2223,15 @@
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+    if (e.key === '/' && !state.doc && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
       e.preventDefault();
       $('#search').focus();
     }
   });
 
-  window.addEventListener('hashchange', () => { readUrl(); state.limit = PAGE_SIZE; render(); });
+  const onNavigate = () => { readUrl(); state.limit = PAGE_SIZE; render(); };
+  window.addEventListener('hashchange', onNavigate);
+  window.addEventListener('popstate', onNavigate);
 
   // Keep the "fetched N min ago" line current.
   setInterval(renderStatus, 60 * 1000);

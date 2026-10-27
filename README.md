@@ -30,6 +30,33 @@ The **Measure** switch picks which one is shown and used for sorting.
 
 **Flagged gaps** are the likely misses: a missing Quality tag, 3 or fewer Expressive tags, or no classification tag. Families with a `/Special use` tag (barcodes, redaction, symbols) get full Expected marks for Expressive and Classification. Thresholds are computed from the live data each time the page loads.
 
+## Tagging proposals
+
+**Propose** on any row (or **Propose tags** for the list shown, up to 25 families) opens a printable proposal for each family:
+
+- a specimen of the family, and its 10 most similar tagged families, each set in its own font, with why they're similar (same superfamily, related name, same designer, category, style, script, axes);
+- the top three classification candidates side by side, each with fonts that carry that tag, to pick by eye;
+- suggested Quality, Expressive and other tags with scores, the range across similar families, support and confidence;
+- a 0–100 scale diagram per suggested tag, placing the family among similar families and well-known fonts at the low, middle and high end, all rendered in their real fonts;
+- existing scores that disagree strongly with similar families, and ready-to-paste `families.csv` rows.
+
+Suggestions are a similarity-weighted vote of the 10 nearest tagged families by catalog metadata (closer families count far more, so a sibling like Asap dominates for Asap Sharp). Each proposal says how far to trust it: the method is re-tested every time by hiding the tags of 150 already-tagged families and predicting them. At the time of writing, suggested Expressive scores are off by about 15 points on average (21 using each tag's average), Quality by about 7, and the right classification is among the top three about 80% of the time.
+
+## Severity report
+
+**Severity report** opens a printable report of where tagging is lacking:
+
+| Level | Rule |
+| --- | --- |
+| Critical | No rows in `families.csv` |
+| High | Missing a `/Quality` tag, or a Sans Serif, Serif, Handwriting or Monospace family with no tag in its classification group |
+| Medium | 3 or fewer `/Expressive` tags, or a Display family with no classification tag |
+| Low | No flagged gaps, but in the bottom 10% of tagged families by tagger % |
+
+It has key findings, recommended next steps (with links to proposals and filtered lists), a coverage histogram, one section per level listing every family in its own font (most-used first), and gaps by tag, by category and by year added. The list can also be sorted by **Most severe gaps**.
+
+Both documents can be printed or saved as PDF, or downloaded as a standalone HTML file that loads the fonts it uses.
+
 ## How it works
 
 It's a single static `index.html` with no build step. On load it fetches:
@@ -40,4 +67,4 @@ It's a single static `index.html` with no build step. On load it fetches:
 | Tags | raw.githubusercontent.com → GitHub API → allorigins / corsproxy.io |
 | Tagger's tag list | googlefonts.github.io/tagger → googlefonts/tagger on GitHub (if both fail, the tags found in families.csv) |
 
-Results are cached in `localStorage` for 24 hours. **Refresh** bypasses the cache and has a 30-second cooldown. If every source fails, the page shows the last cached copy, or you can load the two files by hand.
+Results are cached in `localStorage` for 24 hours. **Refresh** bypasses the cache (a full refresh takes well under a second) and has a 5-second cooldown against double clicks. If every source fails, the page shows the last cached copy, or you can load the two files by hand.
